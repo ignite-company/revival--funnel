@@ -803,6 +803,8 @@ body.quiz-open{overflow:hidden!important}
 }
 @media(max-width:350px){#hero-heading .ignite-headline-primary{font-size:31px}#hero-heading .ignite-headline-secondary{font-size:18px}}
 
+.revival-textarea{display:block;width:100%;min-height:155px;resize:vertical;border:1px solid #ffffff4a;border-radius:13px;background:#19191e;color:#fff;font:inherit;font-size:16px;line-height:1.5;padding:15px;outline:none}.revival-textarea:focus{border-color:#ff4650;box-shadow:0 0 0 3px #ff465030}.revival-textarea::placeholder{color:#92929c}.revival-continue{display:flex;align-items:center;justify-content:center;margin:18px 0 0 auto;min-height:50px;padding:12px 25px}
+.revival-result{text-align:center;padding:16px 8px}.revival-result-mark{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 19px;border-radius:50%;background:#ff465027;border:1px solid #ff46505c;color:#ff7883;font-size:28px;font-weight:900}.revival-result h3{font-size:clamp(24px,3.2vw,36px);letter-spacing:-.04em;line-height:1.15;color:#fff;margin:0 auto 14px}.revival-result p{font-size:15px;color:#c5c5ce;line-height:1.65;max-width:560px;margin:0 auto 24px}.revival-result button{min-height:48px;padding:12px 25px}#revival-partner-note,#revival-permission-note{font-size:13px;line-height:1.5;padding:11px 14px;border-radius:11px;background:#20151a;border:1px solid #fa46503f;color:#f2ccd2;margin:11px 0}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -845,10 +847,10 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
  <div class="ignite-video-frame"><div class="ignite-video-box"><video id="ignite-client-video" controls autoplay playsinline preload="metadata" aria-label="Ignite client testimonial"><source src="https://assets.cdn.filesafe.space/bF1dT8IAVuvat84LkAVe/media/6a336b225408771d165c7749.mp4" type="video/mp4">Your browser does not support video playback.</video><button type="button" id="ignite-unmute" class="ignite-unmute hidden" aria-label="Play video with sound">🔊 Tap for sound</button></div></div>
  <div class="ignite-primary-cta ignite-after-video"><button class="ignite-white-cta ignite-open-quiz" type="button">See If My List Qualifies</button><p>60-SECOND APPLICATION · QUALIFICATION AND WRITTEN TERMS APPLY</p></div>
 </div></section>
-<div class="quiz-overlay hidden" id="quiz-overlay"><div class="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title" tabindex="-1"><div class="ignite-modal-bar"><span id="quiz-modal-title">Your Service Business Growth Review</span><button type="button" id="ignite-quiz-close" aria-label="Close application">✕</button></div><div class="quiz-scroll"><section class="section qualification"><div class="container"><div class="quiz" id="quiz"><div class="quiz-top"><strong id="quiz-step-title">About your service business</strong><span id="quiz-step-count">Step 1 of 4</span><span class="secure-text">🔒 Secure</span></div><div class="progress"><div class="progress-bar" id="quiz-progress"></div></div>
+<div class="quiz-overlay hidden" id="quiz-overlay"><div class="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title" tabindex="-1"><div class="ignite-modal-bar"><span id="quiz-modal-title">See If Your Old Lead List Qualifies</span><button type="button" id="ignite-quiz-close" aria-label="Close application">✕</button></div><div class="quiz-scroll"><section class="section qualification"><div class="container"><div class="quiz" id="quiz"><div class="quiz-top"><strong id="quiz-step-title">About your old leads</strong><span id="quiz-step-count">Step 1 of 10</span><span class="secure-text">🔒 Secure</span></div><div class="progress"><div class="progress-bar" id="quiz-progress"></div></div>
 <div class="quiz-body">
 <div id="question-view"><h3 id="question" class="q-title"></h3><p id="question-desc" class="q-desc"></p><div id="options" class="options"></div><p class="error" id="quiz-error" role="alert"></p><div class="quiz-actions"><button class="linkbtn" type="button" id="prev" disabled>← Back</button><span class="quiz-auto-note">Select an answer to continue</span></div></div>
-<form id="contact-form" class="hidden" novalidate><h3 class="q-title">Where can we reach you?</h3><p class="q-desc">Tell us how to contact you about your service business, then choose a call time.</p><div class="formgrid">
+<form id="contact-form" class="hidden" novalidate><h3 class="q-title">Where can we reach you?</h3><p class="q-desc">Tell us how to reach you with the next step for your application.</p><div class="formgrid">
 <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" required maxlength="160" placeholder="Full name"></div>
 <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="30" placeholder="(555) 555-5555"></div>
 <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="200" placeholder="you@company.com"></div>
@@ -856,17 +858,18 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 </div>
 <div class="honeypot" aria-hidden="true"><label for="other-field">Leave blank</label><input id="other-field" name="other_field" tabindex="-1" autocomplete="off"></div>
 <label class="consent"><input type="checkbox" id="consent" required><span>I agree to be contacted by Ignite Co. about my inquiry by phone or email. This is not consent to automated marketing texts. My information is used to review this application and arrange a call.</span></label>
-<p id="form-error" class="error" role="alert"></p><div class="quiz-actions"><button class="linkbtn" type="button" id="contact-prev">← Back</button><button type="submit" class="cta" id="submit">Save &amp; See Calendar →</button></div></form>
+<p id="form-error" class="error" role="alert"></p><div class="quiz-actions"><button class="linkbtn" type="button" id="contact-prev">← Back</button><button type="submit" class="cta" id="submit">Submit My Answers →</button></div></form>
 <div id="booking-reveal" class="booking-stage hidden" aria-labelledby="booking-heading">
 <div class="booking-intro">
 <span class="booking-eyebrow">FINAL STEP · CHOOSE YOUR APPOINTMENT</span>
-<h3 id="booking-heading" class="q-title">Book your free service business growth review.</h3>
-<p>Your details are saved, but <strong>your call isn't booked yet.</strong> Choose a time below and confirm your appointment to finish.</p>
+<h3 id="booking-heading" class="q-title">Book your free reactivation strategy call.</h3>
+<p>Your details are saved, but <strong>your call isn't booked yet.</strong> Choose a time below and confirm your appointment to finish.</p><p id="revival-partner-note" class="hidden">Please have your business partner join this call so everyone involved in the decision can attend.</p><p id="revival-permission-note" class="hidden">We'll review consent records for your old leads together before any reactivation outreach.</p>
 </div>
 <div class="calendar-shell"><iframe id="calendar" title="Choose and confirm your Ignite Co. systems review appointment" loading="eager" data-src="https://api.leadconnectorhq.com/widget/booking/SmqZP8xY90P4YKenFu50"></iframe></div>
 <a class="calendar-link" target="_blank" rel="noopener noreferrer" href="https://api.leadconnectorhq.com/widget/booking/SmqZP8xY90P4YKenFu50">Calendar not loading? Book directly ↗</a>
 <button class="booking-back" id="booking-back" type="button">← Edit your answers</button>
 </div>
+<div id="result-view" class="revival-result hidden" role="status" aria-live="polite"><div class="revival-result-mark" aria-hidden="true">✓</div><h3 id="result-title"></h3><p id="result-message"></p><button type="button" id="result-close" class="cta">Close</button></div>
 </div></div>
 </div></section>
 </div></div></div>
@@ -993,7 +996,7 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 <details><summary>Is this just another advertising service?<span>+</span></summary><p>No. We look at how a potential customer finds your company, requests service, receives a quote, and becomes a booked job. Depending on your business, the system can include customer acquisition, a website or funnel, automated follow-up, CRM tracking, and appointment booking.</p></details>
 <details><summary>Does it work for my type of service business?<span>+</span></summary><p>Yes. We tailor the approach to the services you offer, the area you serve, your growth goals, and the way your team handles calls, inquiries, and quotes.</p></details>
 <details><summary>Do I need to replace my website or CRM?<span>+</span></summary><p>Not necessarily. We review what you already use and look for practical improvements. The recommended buildout is tailored to your company.</p></details>
-<details><summary>What happens after I answer the questions?<span>+</span></summary><p>Your details are saved securely, and you can choose a time for a free service business growth review. Your call is booked only after you confirm a time on the calendar.</p></details>
+<details><summary>What happens after I answer the questions?<span>+</span></summary><p>We review your answers to see if the reactivation offer or a different system fits. Eligible applicants can choose a call time. Others may receive a follow-up after review. A call is only booked after you select and confirm a time.</p></details>
 </div></div></section>
 <section class="ignite-finish"><div class="container"><div class="ignite-finish-eyebrow">GROW SMARTER WITH IGNITE</div><h2>Better Systems.<br><span class="ignite-red-flow">More Booked Jobs.</span></h2><p>You know how to deliver great work. Build a smarter way to win more customers and manage more jobs.</p><button class="ignite-white-cta ignite-open-quiz" type="button">See If My List Qualifies</button><div class="ignite-quiz-caption">APPLICATION SUBJECT TO QUALIFICATION AND WRITTEN GUARANTEE TERMS</div></div></section>
 </main>
@@ -1004,12 +1007,7 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 function trackEvent(name,properties={}){
  if(typeof window.gtag==='function')window.gtag('event',name,properties);
 }
-const steps=[
- {key:'project_type',title:'What service does your business provide?',desc:'Choose the category that fits your business best.',options:[['construction_roofing','Construction, Remodeling & Roofing'],['mechanical_trades','HVAC, Plumbing & Electrical'],['outdoor_services','Landscaping & Outdoor Services'],['flooring_coatings','Flooring, Epoxy & Concrete'],['junk_cleaning','Junk Removal & Cleaning'],['other_service','Other Service Business']]},
- {key:'monthly_revenue',title:'How much revenue is your business generating per month?',desc:'Choose your current average monthly revenue.',options:[['5k_10k','$5,000–$10,000'],['10k_30k','$10,000–$30,000'],['30k_60k','$30,000–$60,000'],['60k_100k','$60,000–$100,000']]},
- {key:'capacity',title:'How many more projects can your current team take on next month?',desc:'Choose what your team could realistically handle.',options:[['0','0, fully booked'],['1_2','1–2 more projects'],['3_5','3–5 more projects'],['6_10','6–10 more projects'],['10_plus','10+ more projects']]},
- {key:'readiness',title:'How soon would you want a better system in place?',desc:'One that helps turn more inquiries into booked jobs.',options:[['ready_now','As soon as possible'],['need_details','Show me how it works'],['not_ready','Just exploring for now']]}
-];
+const steps=[{"key":"monthly_revenue","title":"What is your monthly revenue?","desc":"Choose your average monthly revenue.","options":[["under_15k","Under $15K"],["15k_30k","$15K–$30K"],["30k_60k","$30K–$60K"],["60k_100k","$60K–$100K"],["100k_plus","$100K+"]]},{"key":"old_leads","title":"How many old estimates and leads do you have in the last 12 months?","desc":"Include old quotes, missed calls and inquiries that never turned into jobs.","options":[["under_50","Under 50"],["50_100","50–100"],["100_250","100–250"],["250_500","250–500"],["500_plus","500+"]]},{"key":"average_job_size","title":"What is your average job size?","desc":"How much is a typical signed project worth?","options":[["under_5k","Under $5K"],["5k_10k","$5K–$10K"],["10k_25k","$10K–$25K"],["25k_plus","$25K+"]]},{"key":"monthly_marketing_budget","title":"What is your monthly ad and marketing budget?","desc":"Include current spending on ads and lead generation.","options":[["under_500","Under $500"],["500_1k","$500–$1K"],["1k_2_5k","$1K–$2.5K"],["2_5k_plus","$2.5K+"]]},{"key":"decision_maker","title":"Are you the decision maker?","desc":"Anyone who needs to approve the system should attend the call.","options":[["yes","Yes"],["with_partner","Yes, with a partner"],["no","No"]]},{"key":"start_timing","title":"When do you want to start?","desc":"Choose the timing that fits your plans.","options":[["this_month","This month"],["next_60_days","Next 60 days"],["researching","Just researching"]]},{"key":"lead_contact_permission","title":"Did these leads agree to hear from you by text or email?","desc":"We will check contact permissions before reaching out to old leads.","options":[["most","Yes, most"],["some","Some"],["not_sure","Not sure"]]},{"key":"lead_storage","title":"Where do the old leads live?","desc":"This helps us understand how your leads are stored.","options":[["phone","Phone"],["crm","CRM"],["spreadsheet","Spreadsheet"],["paper","Paper"]]},{"key":"growth_blocker","title":"What's the biggest thing holding your growth back?","desc":"Tell us in your own words so we can understand your situation.","type":"text"}];
 const state={};let step=0,submitting=false,isAdvancing=false,advanceTimer=null;
 const $=id=>document.getElementById(id),question=$('question'),desc=$('question-desc'),options=$('options'),err=$('quiz-error');
 /* Qualification questions are presented inside an accessible popup. */
@@ -1093,6 +1091,21 @@ function draw(){
  question.textContent=q.title;
  desc.textContent=q.desc;
  options.textContent='';
+ if(q.type==='text'){
+  const input=document.createElement('textarea');
+  input.id='revival-growth-blocker';input.className='revival-textarea';input.rows=5;input.maxLength=1500;
+  input.setAttribute('aria-label','What is holding your growth back?');
+  input.placeholder='For example, we send estimates but rarely hear back from homeowners...';
+  input.value=state[q.key]||'';
+  const next=document.createElement('button');next.type='button';next.className='cta revival-continue';next.textContent='Continue';
+  next.addEventListener('click',()=>{
+   const value=input.value.trim();if(value.length<3){err.textContent='Please share a few words about your biggest challenge.';input.focus();return;}
+   state[q.key]=value;trackEvent('quiz_answer',{question_key:q.key,step_number:step+1});
+   step++;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;$('name').focus({preventScroll:true});
+  });
+  input.addEventListener('input',()=>{err.textContent='';});
+  options.append(input,next);
+ }else{
  q.options.forEach(pair=>{
   const b=document.createElement('button'); b.type='button'; b.className='opt';
   const selected=state[q.key]===pair[0];
@@ -1124,6 +1137,7 @@ function draw(){
   });
   options.append(b);
  });
+ }
  $('prev').disabled=step===0;
  err.textContent='';
 }
@@ -1133,7 +1147,7 @@ $('contact-form').addEventListener('submit',async e=>{e.preventDefault();if(subm
 const data=new FormData(form),query=new URLSearchParams(window.location.search);
 const previousReceipt=readSubmission();
 const contactRecord={name:String(data.get('name')||'').trim(),phone:normalizeUSPhone(data.get('phone'))||String(data.get('phone')||'').trim(),email:String(data.get('email')||'').trim(),business_name:String(data.get('business_name')||'').trim()};
-const payload={...state,funnel_version:'service_business_v3',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
+const payload={...state,funnel_version:'revival_v1',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
 submitting=true;$('submit').disabled=true;$('submit').textContent='Saving your application…';
 try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),16000);let response;try{response=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});}finally{clearTimeout(timeout);}
 if(!response.ok){let detail;try{detail=await response.json();}catch{}throw new Error(detail?.error || 'Could not save your application. Please try again.')}
@@ -1141,14 +1155,36 @@ const receipt=await response.json();
 if(!receipt.ok||!receipt.submission_id||!receipt.edit_token)throw new Error('Unable to confirm saved application.');
 // Both initialized Meta datasets receive the Lead event once for a new saved application.
 // Editing an existing submission must not inflate conversion counts.
-if(!previousReceipt && typeof window.fbq==='function')window.fbq('track','Lead');
-trackEvent('generate_lead',{lead_source:'service_business_growth_quiz'});
-showBookingStep();
-window.sessionStorage.setItem('igniteHomeServicesSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'service_business_v3',answers:{...state},contact:contactRecord}));
+if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead');
+trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});
+window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v1',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
+if(['90_day_system','revival_997'].includes(receipt.offer_route))showBookingStep(receipt.offer_route,receipt.partner_required);
+else showOutcome(receipt.offer_route,receipt.partner_required);
 $('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});}
-catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Save & See Calendar →'}});
+catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Submit My Answers →'}});
 
-function showBookingStep(){
+function showOutcome(route,partnerRequired){
+ $('question-view').classList.add('hidden');$('contact-form').classList.add('hidden');$('booking-reveal').classList.add('hidden');$('result-view').classList.remove('hidden');
+ const title=$('result-title'),body=$('result-message');
+ if(route==='disqualified'){
+  title.textContent='Thanks for sharing your details.';
+  body.textContent="Based on your answers, this particular reactivation offer isn't the right fit right now. We've saved your application, and we won't ask you to book a call for this offer.";
+ }else if(route==='nurture'){
+  title.textContent='Thanks. We have your information.';
+  body.textContent="It sounds like you're still exploring. We'll keep your details on file and can share relevant information by email. There's no need to book a call today.";
+ }else{
+  title.textContent='Your application is under review.';
+  body.textContent="Your answers suggest a possible fit, but we'd like to review your project size before offering a call. We'll reach out using the contact information you provided.";
+ }
+ $('quiz-step-title').textContent='Application received';$('quiz-step-count').textContent='Submitted';$('quiz-progress').style.width='100%';
+ $('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
+ trackEvent('revival_application_routed',{offer_route:route,partner_required:partnerRequired});
+}
+function showBookingStep(route,partnerRequired){
+ $('result-view').classList.add('hidden');
+ $('booking-heading').textContent=route==='90_day_system'?'Book a strategy call for your 90-day follow-up system.':'Book your reactivation strategy call.';
+ $('revival-partner-note').classList.toggle('hidden',!partnerRequired);
+ $('revival-permission-note').classList.toggle('hidden',state.lead_contact_permission==='most');
  trackEvent('booking_calendar_view',{booking_provider:'highlevel'});
  $('question-view').classList.add('hidden');
  $('contact-form').classList.add('hidden');
@@ -1160,8 +1196,8 @@ function showBookingStep(){
  $('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
  if(!$('quiz-overlay').classList.contains('hidden'))$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
 }
-function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteHomeServicesSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='service_business_v3'&&typeof r.answers?.project_type==='string'&&typeof r.answers?.capacity==='string')return r;}catch{}return null;}
-function returnToAnswers(){$('booking-reveal').classList.add('hidden');step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});question.setAttribute('tabindex','-1');question.focus({preventScroll:true});}
+function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteRevivalSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='revival_v1'&&typeof r.answers?.monthly_revenue==='string'&&typeof r.answers?.growth_blocker==='string')return r;}catch{}return null;}
+function returnToAnswers(){$('booking-reveal').classList.add('hidden');$('result-view').classList.add('hidden');step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});question.setAttribute('tabindex','-1');question.focus({preventScroll:true});}
 $('booking-back').addEventListener('click',returnToAnswers);
 const previous=readSubmission();
 if(previous&&previous.answers&&previous.contact){
@@ -1171,7 +1207,8 @@ if(previous&&previous.answers&&previous.contact){
  for(const key of ['phone','email','business_name']){const value=previous.contact[key];if(typeof value==='string') $('contact-form').elements.namedItem(key).value=value;}
  $('phone').value=formatUSPhone($('phone').value);
  $('consent').checked=true;
- showBookingStep();
+ if(['90_day_system','revival_997'].includes(previous.offer_route))showBookingStep(previous.offer_route,previous.partner_required);
+ else showOutcome(previous.offer_route,previous.partner_required);
 }else draw();
 
 /* Track meaningful content visibility, rather than only page load. */
@@ -1222,6 +1259,7 @@ function closeQuiz(){
 }
 document.querySelectorAll('.ignite-open-quiz').forEach(button=>button.addEventListener('click',openQuiz));
 closeQuizBtn.addEventListener('click',closeQuiz);
+$('result-close').addEventListener('click',closeQuiz);
 quizOverlay.addEventListener('click',event=>{if(event.target===quizOverlay)closeQuiz();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!quizOverlay.classList.contains('hidden')){event.preventDefault();closeQuiz();}});
 quizOverlay.addEventListener('keydown',event=>{
