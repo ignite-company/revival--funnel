@@ -1163,7 +1163,28 @@ else showOutcome(receipt.offer_route,receipt.partner_required);
 $('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});}
 catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Submit My Answers →'}});
 
-function showBookingStep(){
+function showOutcome(route,partnerRequired){
+ $('question-view').classList.add('hidden');$('contact-form').classList.add('hidden');$('booking-reveal').classList.add('hidden');$('result-view').classList.remove('hidden');
+ const title=$('result-title'),body=$('result-message');
+ if(route==='disqualified'){
+  title.textContent='Thanks for sharing your details.';
+  body.textContent="Based on your answers, this particular reactivation offer isn't the right fit right now. We've saved your application, and we won't ask you to book a call for this offer.";
+ }else if(route==='nurture'){
+  title.textContent='Thanks. We have your information.';
+  body.textContent="It sounds like you're still exploring. We'll keep your details on file and can share relevant information by email. There's no need to book a call today.";
+ }else{
+  title.textContent='Your application is under review.';
+  body.textContent="Your answers suggest a possible fit, but we'd like to review your project size before offering a call. We'll reach out using the contact information you provided.";
+ }
+ $('quiz-step-title').textContent='Application received';$('quiz-step-count').textContent='Submitted';$('quiz-progress').style.width='100%';
+ $('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
+ trackEvent('revival_application_routed',{offer_route:route,partner_required:partnerRequired});
+}
+function showBookingStep(route,partnerRequired){
+ $('result-view').classList.add('hidden');
+ $('booking-heading').textContent=route==='90_day_system'?'Book a strategy call for your 90-day follow-up system.':'Book your reactivation strategy call.';
+ $('revival-partner-note').classList.toggle('hidden',!partnerRequired);
+ $('revival-permission-note').classList.toggle('hidden',state.lead_contact_permission==='most');
  trackEvent('booking_calendar_view',{booking_provider:'highlevel'});
  $('question-view').classList.add('hidden');
  $('contact-form').classList.add('hidden');
