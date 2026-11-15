@@ -1,182 +1,119 @@
 'use strict';
 const { randomUUID } = require('node:crypto');
 
-// Server-side qualification intake. No Meta Pixel or analytics SDK.
-// Save consented applications to Supabase, then notify GoHighLevel.
-
-const allowed = {
-  project_type: ['kitchens','bathrooms','both','remodeling','hvac','plumbing','electrical','roofing','landscaping','junk_removal','restoration','cleaning','pest_control','garage_doors','other_home_service','roofing_siding','masonry_hardscaping','interior_remodeling','tree_service','painting','auto_detailing','pressure_washing','other_service','epoxy_coatings','flooring','construction_roofing','mechanical_trades','outdoor_services','flooring_coatings','junk_cleaning'],
-  monthly_revenue: ['under_20k','20k_50k','50k_100k','100k_plus','5k_10k','10k_30k','30k_60k','60k_100k'],
-  monthly_inquiries: ['under_10','10_25','26_50','50_plus','unsure'],
-  biggest_gap: ['missed_calls','slow_followup','reactivation','reviews','lead_quality','other','not_enough_leads','low_conversion','poor_follow_up','repeat_business','inconsistent_growth'],
-  capacity: ['yes','limited','booked_out','unsure','0','1_2','3_5','6_10','10_plus'],
-  readiness: ['ready_now','need_details','not_ready']
+// Revival Funnel intake, separate from the original Ignite growth funnel.
+// The server decides eligibility and offer routing. Never trust client-provided routing.
+const answers = {
+  monthly_revenue: ['under_15k','15k_30k','30k_60k','60k_100k','100k_plus'],
+  old_leads: ['under_50','50_100','100_250','250_500','500_plus'],
+  average_job_size: ['under_5k','5k_10k','10k_25k','25k_plus'],
+  monthly_marketing_budget: ['under_500','500_1k','1k_2_5k','2_5k_plus'],
+  decision_maker: ['yes','with_partner','no'],
+  start_timing: ['this_month','next_60_days','researching'],
+  lead_contact_permission: ['most','some','not_sure'],
+  lead_storage: ['phone','crm','spreadsheet','paper']
 };
-
-function limited(value, max) {
-  return typeof value === 'string' ? value.trim().slice(0,max) : '';
+const labels = {
+  monthly_revenue: {under_15k:'Under $15K','15k_30k':'$15K–$30K','30k_60k':'$30K–$60K','60k_100k':'$60K–$100K',100k_plus:'$100K+'},
+  old_leads: {under_50:'Under 50',50_100:'50–100',100_250:'100–250',250_500:'250–500',500_plus:'500+'},
+  average_job_size: {under_5k:'Under $5K',5k_10k:'$5K–$10K',10k_25k:'$10K–$25K',25k_plus:'$25K+'},
+  monthly_marketing_budget: {under_500:'Under $500',500_1k:'$500–$1K',1k_2_5k:'$1K–$2.5K',2_5k_plus:'$2.5K+'},
+  decision_maker: {yes:'Yes',with_partner:'Yes, with a partner',no:'No'},
+  start_timing: {this_month:'This month',next_60_days:'Next 60 days',researching:'Just researching'},
+  lead_contact_permission: {most:'Yes, most',some:'Some',not_sure:'Not sure'},
+  lead_storage: {phone:'Phone',crm:'CRM',spreadsheet:'Spreadsheet',paper:'Paper'}
+};
+function text(value,max){return typeof value === 'string'?value.trim().slice(0,max):'';}
+function valid(value,min,max){return typeof value==='string'&&value.trim().length>=min&&value.trim().length<=max;}
+function respond(res,status,data){res.setHeader('Cache-Control','no-store');return res.status(status).json(data);}
+function determineRoute(data){
+  if(['under_15k','15k_30k'].includes(data.monthly_revenue) ||
+    data.average_job_size==='under_5k' ||
+    data.monthly_marketing_budget==='under_500' ||
+    data.decision_maker==='no')return 'disqualified';
+  if(data.start_timing==='researching')return 'nurture';
+  if(['under_50','50_100'].includes(data.old_leads))return '90_day_system';
+  if(data.average_job_size==='5k_10k')return 'manual_review';
+  return 'revival_997';
 }
-function validText(value, max, min=1) {
-  return typeof value === 'string' && value.trim().length >= min && value.trim().length <= max;
-}
-function send(res,status,result) {
-  res.status(status).setHeader('Cache-Control','no-store');
-  return res.json(result);
-}
-
-module.exports = async function handler(req,res) {
+module.exports=async function handler(req,res){
   res.setHeader('X-Content-Type-Options','nosniff');
-  if(req.method !== 'POST') {
-    res.setHeader('Allow','POST');
-    return send(res,405,{error:'Method not allowed'});
+  if(req.method!=='POST'){res.setHeader('Allow','POST');return respond(res,405,{error:'Method not allowed'});}
+  if(!String(req.headers['content-type']||'').includes('application/json'))return respond(res,415,{error:'Use JSON'});
+  if(Number(req.headers['content-length']||0)>12000)return respond(res,413,{error:'Request is too large'});
+  let data=req.body;
+  if(typeof data==='string'){try{data=JSON.parse(data);}catch{return respond(res,400,{error:'Invalid request'});}}
+  if(!data||typeof data!=='object'||Array.isArray(data))return respond(res,400,{error:'Invalid request'});
+  if(data.other_field)return respond(res,201,{ok:true});
+  if(data.funnel_version!=='revival_v1')return respond(res,400,{error:'Unrecognized application version'});
+  for(const [key,allowed] of Object.entries(answers)){
+    if(!allowed.includes(data[key]))return respond(res,400,{error:'Please complete all qualification questions',field:key});
   }
-  if(!String(req.headers['content-type']||'').includes('application/json')) return send(res,415,{error:'Use JSON'});
-  const length = Number(req.headers['content-length'] || 0);
-  if(length > 12000) return send(res,413,{error:'Request is too large'});
-  let data = req.body;
-  if(typeof data === 'string') {
-    try {data = JSON.parse(data);}catch {return send(res,400,{error:'Invalid request'});}
-  }
-  if(!data || typeof data !== 'object' || Array.isArray(data)) return send(res,400,{error:'Invalid request'});
-  // Honeypot. Never create records for bots filling hidden fields.
-  if(data.other_field) return send(res,201,{ok:true});
-  // Keep earlier quiz versions working while supporting capacity-based qualification.
-  const isCapacityFlow = data.funnel_version === 'service_business_v3';
-  const isConstructionApplication = data.readiness != null;
-  if(isConstructionApplication) {
-    if(!allowed.readiness.includes(data.readiness)) return send(res,400,{error:'Please confirm when you are ready to get started'});
-    if(!allowed.project_type.includes(data.project_type)) return send(res,400,{error:'Please select your business service'});
-  } else if(!allowed.monthly_inquiries.includes(data.monthly_inquiries)) {
-    return send(res,400,{error:'Please complete the qualification questions'});
-  }
-  if(data.project_type != null && !allowed.project_type.includes(data.project_type)) return send(res,400,{error:'Invalid business type'});
-  // Require the current four revenue bands for service-business funnels.
-  if(['service_business_v2','service_business_v3'].includes(data.funnel_version) && !['5k_10k','10k_30k','30k_60k','60k_100k'].includes(data.monthly_revenue)) return send(res,400,{error:'Please select your monthly business revenue'});
-  if(isCapacityFlow && !['construction_roofing','mechanical_trades','outdoor_services','flooring_coatings','junk_cleaning','other_service'].includes(data.project_type)) return send(res,400,{error:'Please choose your service category'});
-  if(isCapacityFlow && !['0','1_2','3_5','6_10','10_plus'].includes(data.capacity)) return send(res,400,{error:'Please choose how many additional projects you can take on'});
-  if(data.monthly_inquiries != null && !allowed.monthly_inquiries.includes(data.monthly_inquiries)) return send(res,400,{error:'Invalid lead volume'});
-  // Allow legacy open forms to send these fields, but never require them.
-  for(const key of ['monthly_revenue','capacity']) if(data[key] != null && !allowed[key].includes(data[key])) return send(res,400,{error:'Invalid qualification answer'});
-  const gaps = Array.isArray(data.biggest_gaps) ? [...new Set(data.biggest_gaps)] : (typeof data.biggest_gap === 'string' ? [data.biggest_gap] : []);
-  if((!isCapacityFlow && !gaps.length) || gaps.length > allowed.biggest_gap.length || !gaps.every(value=>typeof value==='string' && allowed.biggest_gap.includes(value))){
-    return send(res,400,{error:'Select at least one business challenge'});
-  }
-  // Support a single Name field while remaining compatible with older saved forms.
-  const enteredName = typeof data.name === 'string' ? data.name.trim().replace(/\s+/g,' ') : '';
-  if(typeof data.name === 'string' && !validText(enteredName,160)) return send(res,400,{error:'Please enter your name'});
-  const namePieces = enteredName ? enteredName.split(' ') : [];
-  const firstName = enteredName ? namePieces.shift() : limited(data.first_name,80);
-  const lastName = enteredName ? namePieces.join(' ') : limited(data.last_name,80);
-  const serviceArea = limited(data.service_area,150);
-  if(!validText(firstName,80) || (lastName && !validText(lastName,80)) || !validText(data.business_name,150,2)) return send(res,400,{error:'Please provide valid contact details'});
-  if(data.service_area != null && serviceArea && !validText(serviceArea,150,2)) return send(res,400,{error:'Invalid service area'});
-  if(!validText(data.email,200,5)|| !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) return send(res,400,{error:'Please use a valid business email'});
-  // Accept either a 10-digit US number or a +1-prefixed autofill value.
-  const digits = limited(data.phone,30).replace(/\D/g,'');
-  const nationalPhone = digits.length===11 && digits.startsWith('1') ? digits.slice(1) : digits;
-  if(!/^\d{10}$/.test(nationalPhone)) return send(res,400,{error:'Please use a valid 10-digit US phone number'});
-  const normalizedPhone = '+1' + nationalPhone;
-  if(data.consent !== true) return send(res,400,{error:'Contact permission is required'});
-  if(data.website != null && !validText(data.website,250,0)) return send(res,400,{error:'Invalid website'});
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if(!url || !key) {
-    console.error('Funnel application storage environment is not configured');
-    return send(res,503,{error:'Application service unavailable'});
-  }
-  const isEdit = Boolean(data.submission_id || data.edit_token);
-  const uuidRx = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  if(isEdit && (!uuidRx.test(data.submission_id||'') || !uuidRx.test(data.edit_token||''))) return send(res,400,{error:'Invalid edit session'});
-  const submissionId = isEdit ? data.submission_id : randomUUID();
-  const editToken = isEdit ? data.edit_token : randomUUID();
-  const payload = {
-    first_name:firstName,
-    last_name:lastName||null,
-    business_name:limited(data.business_name,150),
-    email:limited(data.email,200).toLowerCase(),
-    phone:normalizedPhone,
-    service_area:serviceArea||null,
-    website:data.website?limited(data.website,250):null,
-    project_type:data.project_type??'junk_removal',monthly_revenue:data.monthly_revenue??null,monthly_inquiries:data.monthly_inquiries??null,readiness:data.readiness??null,
-    biggest_gap:isCapacityFlow?null:(gaps[0]??null),biggest_gaps:isCapacityFlow?[]:gaps,capacity:data.capacity??null,consent:true,source:'home_services_funnel',
-    utm_source:limited(data.utm_source,100)||null,
-    utm_medium:limited(data.utm_medium,100)||null,
-    utm_campaign:limited(data.utm_campaign,100)||null
+  if(!valid(data.growth_blocker,3,1500))return respond(res,400,{error:'Please describe what is holding your growth back',field:'growth_blocker'});
+  const fullName=text(data.name,160).replace(/\s+/g,' ');
+  const nameParts=fullName.split(' ');
+  const firstName=nameParts.shift()||'';
+  const lastName=nameParts.join(' ');
+  if(!valid(firstName,1,80)||!valid(lastName,0,80)||!valid(data.business_name,2,150))return respond(res,400,{error:'Please provide valid contact details'});
+  if(!valid(data.email,5,200)||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()))return respond(res,400,{error:'Please enter a valid email address'});
+  const digits=text(data.phone,30).replace(/\D/g,'');
+  const national=digits.length===11&&digits.startsWith('1')?digits.slice(1):digits;
+  if(!/^\d{10}$/.test(national))return respond(res,400,{error:'Please provide a valid 10-digit US phone number'});
+  if(data.consent!==true)return respond(res,400,{error:'Contact permission is required'});
+  const url=process.env.SUPABASE_URL;
+  const key=process.env.SUPABASE_PUBLISHABLE_KEY;
+  if(!url||!key){console.error('Revival funnel Supabase configuration missing');return respond(res,503,{error:'Application service unavailable'});}
+  const edit=Boolean(data.submission_id||data.edit_token);
+  const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if(edit&&(!uuid.test(data.submission_id||'')||!uuid.test(data.edit_token||'')))return respond(res,400,{error:'Invalid edit session'});
+  const submissionId=edit?data.submission_id:randomUUID();
+  const editToken=edit?data.edit_token:randomUUID();
+  const route=determineRoute(data);
+  const record={
+    first_name:firstName,last_name:lastName||null,business_name:text(data.business_name,150),
+    email:text(data.email,200).toLowerCase(),phone:'+1'+national,
+    monthly_revenue:data.monthly_revenue,old_leads:data.old_leads,average_job_size:data.average_job_size,
+    monthly_marketing_budget:data.monthly_marketing_budget,decision_maker:data.decision_maker,
+    start_timing:data.start_timing,lead_contact_permission:data.lead_contact_permission,
+    lead_storage:data.lead_storage,growth_blocker:text(data.growth_blocker,1500),
+    consent:true,source:'revival_funnel',
+    utm_source:text(data.utm_source,100)||null,
+    utm_medium:text(data.utm_medium,100)||null,
+    utm_campaign:text(data.utm_campaign,100)||null
   };
+  const endpoint=url.replace(/\/$/,'')+(edit?'/rest/v1/rpc/update_revival_funnel_application':'/rest/v1/revival_funnel_leads');
+  const headers={'Content-Type':'application/json','apikey':key,'Prefer':'return=minimal'};
+  if(!key.startsWith('sb_publishable_'))headers.Authorization='Bearer '+key;
   try {
-    const headers = {'Content-Type':'application/json','apikey':key,'Prefer':'return=minimal'};
-    if(!key.startsWith('sb_publishable_'))headers.Authorization='Bearer '+key;
-    const endpoint = url.replace(/\/$/,'') + (isEdit ? '/rest/v1/rpc/update_remodel_funnel_application' : '/rest/v1/remodel_funnel_leads');
-    const body = isEdit
-      ? {p_id:submissionId,p_token:editToken,p_data:payload}
-      : {...payload,id:submissionId,edit_token:editToken};
-    const upstream = await fetch(endpoint,{
-      method:'POST',headers,body:JSON.stringify(body),signal:AbortSignal.timeout(9000)
-    });
-    if(!upstream.ok) {
-      console.error('Database write failed, status:',upstream.status);
-      return send(res,502,{error:'Unable to save application right now'});
-    }
-    if(isEdit && (await upstream.text()).trim() !== 'true') {
-      return send(res,409,{error:'This editing session expired. Please refresh and submit again.'});
-    }
-
-    // A GoHighLevel incoming webhook is a server-to-server integration.
-    // Keep its URL out of the public webpage and never send the edit token.
-    const webhookUrl = process.env.GHL_LEAD_WEBHOOK_URL;
-    if(webhookUrl) {
-      const webhookPayload = {
-        event_type: isEdit ? 'application_updated' : 'application_submitted',
-        submission_id: submissionId,
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        name: [payload.first_name,payload.last_name].filter(Boolean).join(' '),
-        email: payload.email,
-        phone: payload.phone,
-        company_name: payload.business_name,
-        business_name: payload.business_name,
-        service_area: payload.service_area,
-        website: payload.website,
-        project_type: payload.project_type,
-        monthly_revenue: payload.monthly_revenue,
-        monthly_revenue_text: {under_20k:'Under $20,000', '20k_50k':'$20,000–$49,999','50k_100k':'$50,000–$99,999', '100k_plus':'$100,000+', '5k_10k':'$5,000–$10,000', '10k_30k':'$10,000–$30,000', '30k_60k':'$30,000–$60,000', '60k_100k':'$60,000–$100,000'}[payload.monthly_revenue] || payload.monthly_revenue,
-        monthly_inquiries: payload.monthly_inquiries,
-        readiness: payload.readiness,
-        readiness_text: {ready_now:'Yes, ready to implement',need_details:'Open to learning more',not_ready:'Not ready right now'}[payload.readiness] || null,
-        construction_type_text: {kitchens:'Kitchen Remodeling',bathrooms:'Bathroom Remodeling',both:'Kitchens & Bathrooms',remodeling:'Construction / Remodeling',roofing:'Roofing',roofing_siding:'Roofing / Siding',masonry_hardscaping:'Masonry / Hardscaping',interior_remodeling:'Interior Remodeling',hvac:'HVAC',landscaping:'Landscaping',epoxy_coatings:'Epoxy / Concrete Coatings',flooring:'Flooring',plumbing:'Plumbing',electrical:'Electrical',tree_service:'Tree Services',junk_removal:'Junk Removal',cleaning:'Cleaning',restoration:'Restoration',painting:'Painting',pressure_washing:'Pressure Washing',pest_control:'Pest Control',garage_doors:'Garage Doors',auto_detailing:'Auto Detailing',other_home_service:'Other Home Service',other_service:'Other Service Business',construction_roofing:'Construction / Remodeling / Roofing',mechanical_trades:'HVAC / Plumbing / Electrical',outdoor_services:'Landscaping / Tree / Outdoor Services',flooring_coatings:'Flooring / Epoxy / Concrete',junk_cleaning:'Junk Removal / Cleaning'}[payload.project_type] || null,
-        remodeling_type_text: {kitchens:'Kitchen Remodeling',bathrooms:'Bathroom Remodeling',both:'Kitchens & Bathrooms'}[payload.project_type] || null,
-        service_type_text: {kitchens:'Kitchen Remodeling',bathrooms:'Bathroom Remodeling',both:'Kitchens & Bathrooms',remodeling:'Construction / Remodeling',roofing:'Roofing',roofing_siding:'Roofing / Siding',masonry_hardscaping:'Masonry / Hardscaping',interior_remodeling:'Interior Remodeling',hvac:'HVAC',landscaping:'Landscaping',epoxy_coatings:'Epoxy / Concrete Coatings',flooring:'Flooring',plumbing:'Plumbing',electrical:'Electrical',tree_service:'Tree Services',junk_removal:'Junk Removal',cleaning:'Cleaning',restoration:'Restoration',painting:'Painting',pressure_washing:'Pressure Washing',pest_control:'Pest Control',garage_doors:'Garage Doors',auto_detailing:'Auto Detailing',other_home_service:'Other Home Service',other_service:'Other Service Business',construction_roofing:'Construction / Remodeling / Roofing',mechanical_trades:'HVAC / Plumbing / Electrical',outdoor_services:'Landscaping / Tree / Outdoor Services',flooring_coatings:'Flooring / Epoxy / Concrete',junk_cleaning:'Junk Removal / Cleaning'}[payload.project_type] || payload.project_type,
-        biggest_gap: payload.biggest_gap,
-        biggest_gaps: payload.biggest_gaps,
-        biggest_gaps_text: payload.biggest_gaps.join(', '),
-        biggest_gap_display: {not_enough_leads:'Not enough homeowner inquiries',lead_quality:'Too many price shoppers',low_conversion:'Consultations not becoming jobs',poor_follow_up:'Estimates and leads go cold',inconsistent_growth:'Unpredictable project pipeline'}[payload.biggest_gap] || payload.biggest_gap,
-        capacity: payload.capacity,
-        capacity_text: {yes:'Has room for more jobs',limited:'Limited availability',booked_out:'Fully booked',unsure:'Not sure','0':'0 additional projects','1_2':'1–2 additional projects','3_5':'3–5 additional projects','6_10':'6–10 additional projects', '10_plus':'10+ additional projects'}[payload.capacity] || payload.capacity,
-        consent: true,
-        source: ['service_business_v2','service_business_v3'].includes(data.funnel_version) ? 'Ignite Service Business Funnel' : (['kitchens','bathrooms','both'].includes(payload.project_type) ? 'Ignite Kitchen & Bath Funnel' : 'Ignite Home Services Funnel'),
-        funnel_version: ['service_business_v2','service_business_v3'].includes(data.funnel_version) ? data.funnel_version : null,
-        utm_source: payload.utm_source,
-        utm_medium: payload.utm_medium,
-        utm_campaign: payload.utm_campaign
+    const db=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(edit?{p_id:submissionId,p_token:editToken,p_data:record}:{...record,id:submissionId,edit_token:editToken}),signal:AbortSignal.timeout(9000)});
+    if(!db.ok){console.error('Revival funnel insert/update returned',db.status);return respond(res,502,{error:'Could not save application right now'});}
+    if(edit&&(await db.text()).trim()!=='true')return respond(res,409,{error:'Your editing session expired. Please refresh to submit again.'});
+    const webhookUrl=process.env.GHL_LEAD_WEBHOOK_URL;
+    if(webhookUrl){
+      const hookPayload={
+        event_type:edit?'revival_application_updated':'revival_application_submitted',
+        source:'Ignite Revival Funnel',funnel_version:'revival_v1',submission_id:submissionId,
+        first_name:firstName,last_name:lastName||null,name:fullName,
+        business_name:record.business_name,company_name:record.business_name,
+        email:record.email,phone:record.phone,
+        ...Object.fromEntries(Object.keys(answers).flatMap(field=>[[field,record[field]],[field+'_text',labels[field][record[field]]]])),
+        growth_blocker:record.growth_blocker,
+        offer_route:route,lead_segment:route,qualified_for_call:['90_day_system','revival_997'].includes(route),
+        partner_required:data.decision_maker==='with_partner',
+        manual_review_required:route==='manual_review',
+        nurture_only:route==='nurture',
+        disqualified:route==='disqualified',
+        consent:true,
+        // Consent to contact the applicant is not proof that their old contacts opted into outreach.
+        old_list_permission_review_required:data.lead_contact_permission!=='most',
+        verify_individual_outreach_consent_before_reactivation:true,
+        utm_source:record.utm_source,utm_medium:record.utm_medium,utm_campaign:record.utm_campaign
       };
-      try {
-        const hookResponse = await fetch(webhookUrl,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(webhookPayload),
-          signal:AbortSignal.timeout(6000)
-        });
-        if(!hookResponse.ok) console.error('GoHighLevel webhook delivery returned:',hookResponse.status);
-      } catch (hookError) {
-        console.error('GoHighLevel webhook delivery failed:',hookError?.name || 'UnknownError');
-      }
-    } else {
-      console.error('GoHighLevel webhook environment variable not configured');
-    }
-
-    return send(res,isEdit?200:201,{ok:true,submission_id:submissionId,edit_token:editToken});
-  } catch(err) {
-    console.error('Application submission failed:',err?.name || 'UnknownError');
-    return send(res,503,{error:'Unable to save application right now'});
-  }
+      try{
+        const delivery=await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(hookPayload),signal:AbortSignal.timeout(6000)});
+        if(!delivery.ok)console.error('Revival GHL webhook returned',delivery.status);
+      }catch(e){console.error('Revival GHL webhook failure',e?.name||'UnknownError');}
+    }else console.error('Revival GHL webhook not configured');
+    return respond(res,edit?200:201,{ok:true,submission_id:submissionId,edit_token:editToken,offer_route:route,partner_required:data.decision_maker==='with_partner'});
+  }catch(e){console.error('Revival submission error',e?.name||'UnknownError');return respond(res,503,{error:'Could not save application right now'});}
 };
