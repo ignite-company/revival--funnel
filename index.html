@@ -1012,12 +1012,7 @@ const steps=[{"key":"monthly_revenue","title":"What is your monthly revenue?","d
 const state={};let step=0,submitting=false,isAdvancing=false,advanceTimer=null;
 const $=id=>document.getElementById(id),question=$('question'),desc=$('question-desc'),options=$('options'),err=$('quiz-error');
 /* Qualification questions are presented inside an accessible popup. */
-const optionEmoji={
- construction_roofing:'🏗️',mechanical_trades:'🔧',outdoor_services:'🌳',flooring_coatings:'🪣',junk_cleaning:'🚛',other_service:'🏢',
- '5k_10k':'🌱','10k_30k':'📈','30k_60k':'💰','60k_100k':'🚀',
- '0':'📅','1_2':'🧰','3_5':'🏗️','6_10':'📈','10_plus':'🚀',
- ready_now:'🚀',need_details:'💬',not_ready:'🗓️'
-};
+const optionEmoji={"under_15k":"📊","15k_30k":"📈","30k_60k":"💰","60k_100k":"🚀","100k_plus":"🏆","under_50":"📱","50_100":"📋","100_250":"🗂️","250_500":"📚","500_plus":"📦","under_5k":"🛠️","5k_10k":"🏡","10k_25k":"🏠","25k_plus":"🏗️","under_500":"🌱","500_1k":"📢","1k_2_5k":"📣","2_5k_plus":"📈","yes":"✅","with_partner":"🤝","no":"👥","this_month":"🚀","next_60_days":"📅","researching":"🔎","most":"✅","some":"📝","not_sure":"❓","phone":"📱","crm":"💻","spreadsheet":"📊","paper":"🗃️"};
 let quizStarted=false;
 
 function phoneDigits(value){
