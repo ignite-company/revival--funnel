@@ -14,10 +14,10 @@ const answers = {
   lead_storage: ['phone','crm','spreadsheet','paper']
 };
 const labels = {
-  monthly_revenue: {under_15k:'Under $15K','15k_30k':'$15K–$30K','30k_60k':'$30K–$60K','60k_100k':'$60K–$100K',100k_plus:'$100K+'},
-  old_leads: {under_50:'Under 50',50_100:'50–100',100_250:'100–250',250_500:'250–500',500_plus:'500+'},
-  average_job_size: {under_5k:'Under $5K',5k_10k:'$5K–$10K',10k_25k:'$10K–$25K',25k_plus:'$25K+'},
-  monthly_marketing_budget: {under_500:'Under $500',500_1k:'$500–$1K',1k_2_5k:'$1K–$2.5K',2_5k_plus:'$2.5K+'},
+  monthly_revenue: {under_15k:'Under $15K','15k_30k':'$15K–$30K','30k_60k':'$30K–$60K','60k_100k':'$60K–$100K','100k_plus':'$100K+'},
+  old_leads: {under_50:'Under 50','50_100':'50–100','100_250':'100–250','250_500':'250–500','500_plus':'500+'},
+  average_job_size: {under_5k:'Under $5K','5k_10k':'$5K–$10K','10k_25k':'$10K–$25K','25k_plus':'$25K+'},
+  monthly_marketing_budget: {under_500:'Under $500','500_1k':'$500–$1K','1k_2_5k':'$1K–$2.5K','2_5k_plus':'$2.5K+'},
   decision_maker: {yes:'Yes',with_partner:'Yes, with a partner',no:'No'},
   start_timing: {this_month:'This month',next_60_days:'Next 60 days',researching:'Just researching'},
   lead_contact_permission: {most:'Yes, most',some:'Some',not_sure:'Not sure'},
