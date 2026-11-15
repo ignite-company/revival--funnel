@@ -1147,7 +1147,7 @@ $('contact-form').addEventListener('submit',async e=>{e.preventDefault();if(subm
 const data=new FormData(form),query=new URLSearchParams(window.location.search);
 const previousReceipt=readSubmission();
 const contactRecord={name:String(data.get('name')||'').trim(),phone:normalizeUSPhone(data.get('phone'))||String(data.get('phone')||'').trim(),email:String(data.get('email')||'').trim(),business_name:String(data.get('business_name')||'').trim()};
-const payload={...state,funnel_version:'service_business_v3',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
+const payload={...state,funnel_version:'revival_v1',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
 submitting=true;$('submit').disabled=true;$('submit').textContent='Saving your application…';
 try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),16000);let response;try{response=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});}finally{clearTimeout(timeout);}
 if(!response.ok){let detail;try{detail=await response.json();}catch{}throw new Error(detail?.error || 'Could not save your application. Please try again.')}
@@ -1155,12 +1155,13 @@ const receipt=await response.json();
 if(!receipt.ok||!receipt.submission_id||!receipt.edit_token)throw new Error('Unable to confirm saved application.');
 // Both initialized Meta datasets receive the Lead event once for a new saved application.
 // Editing an existing submission must not inflate conversion counts.
-if(!previousReceipt && typeof window.fbq==='function')window.fbq('track','Lead');
-trackEvent('generate_lead',{lead_source:'service_business_growth_quiz'});
-showBookingStep();
-window.sessionStorage.setItem('igniteHomeServicesSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'service_business_v3',answers:{...state},contact:contactRecord}));
+if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead');
+trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});
+window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v1',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
+if(['90_day_system','revival_997'].includes(receipt.offer_route))showBookingStep(receipt.offer_route,receipt.partner_required);
+else showOutcome(receipt.offer_route,receipt.partner_required);
 $('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});}
-catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Save & See Calendar →'}});
+catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Submit My Answers →'}});
 
 function showBookingStep(){
  trackEvent('booking_calendar_view',{booking_provider:'highlevel'});
@@ -1174,8 +1175,8 @@ function showBookingStep(){
  $('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
  if(!$('quiz-overlay').classList.contains('hidden'))$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
 }
-function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteHomeServicesSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='service_business_v3'&&typeof r.answers?.project_type==='string'&&typeof r.answers?.capacity==='string')return r;}catch{}return null;}
-function returnToAnswers(){$('booking-reveal').classList.add('hidden');step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});question.setAttribute('tabindex','-1');question.focus({preventScroll:true});}
+function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteRevivalSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='revival_v1'&&typeof r.answers?.monthly_revenue==='string'&&typeof r.answers?.growth_blocker==='string')return r;}catch{}return null;}
+function returnToAnswers(){$('booking-reveal').classList.add('hidden');$('result-view').classList.add('hidden');step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});question.setAttribute('tabindex','-1');question.focus({preventScroll:true});}
 $('booking-back').addEventListener('click',returnToAnswers);
 const previous=readSubmission();
 if(previous&&previous.answers&&previous.contact){
@@ -1185,7 +1186,8 @@ if(previous&&previous.answers&&previous.contact){
  for(const key of ['phone','email','business_name']){const value=previous.contact[key];if(typeof value==='string') $('contact-form').elements.namedItem(key).value=value;}
  $('phone').value=formatUSPhone($('phone').value);
  $('consent').checked=true;
- showBookingStep();
+ if(['90_day_system','revival_997'].includes(previous.offer_route))showBookingStep(previous.offer_route,previous.partner_required);
+ else showOutcome(previous.offer_route,previous.partner_required);
 }else draw();
 
 /* Track meaningful content visibility, rather than only page load. */
@@ -1236,6 +1238,7 @@ function closeQuiz(){
 }
 document.querySelectorAll('.ignite-open-quiz').forEach(button=>button.addEventListener('click',openQuiz));
 closeQuizBtn.addEventListener('click',closeQuiz);
+$('result-close').addEventListener('click',closeQuiz);
 quizOverlay.addEventListener('click',event=>{if(event.target===quizOverlay)closeQuiz();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!quizOverlay.classList.contains('hidden')){event.preventDefault();closeQuiz();}});
 quizOverlay.addEventListener('keydown',event=>{
