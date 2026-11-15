@@ -803,6 +803,7 @@ body.quiz-open{overflow:hidden!important}
 }
 @media(max-width:350px){#hero-heading .ignite-headline-primary{font-size:31px}#hero-heading .ignite-headline-secondary{font-size:18px}}
 
+.revival-textarea{display:block;width:100%;min-height:155px;resize:vertical;border:1px solid #ffffff4a;border-radius:13px;background:#19191e;color:#fff;font:inherit;font-size:16px;line-height:1.5;padding:15px;outline:none}.revival-textarea:focus{border-color:#ff4650;box-shadow:0 0 0 3px #ff465030}.revival-textarea::placeholder{color:#92929c}.revival-continue{display:flex;align-items:center;justify-content:center;margin:18px 0 0 auto;min-height:50px;padding:12px 25px}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -1088,6 +1089,21 @@ function draw(){
  question.textContent=q.title;
  desc.textContent=q.desc;
  options.textContent='';
+ if(q.type==='text'){
+  const input=document.createElement('textarea');
+  input.id='revival-growth-blocker';input.className='revival-textarea';input.rows=5;input.maxLength=1500;
+  input.setAttribute('aria-label','What is holding your growth back?');
+  input.placeholder='For example, we send estimates but rarely hear back from homeowners...';
+  input.value=state[q.key]||'';
+  const next=document.createElement('button');next.type='button';next.className='cta revival-continue';next.textContent='Continue';
+  next.addEventListener('click',()=>{
+   const value=input.value.trim();if(value.length<3){err.textContent='Please share a few words about your biggest challenge.';input.focus();return;}
+   state[q.key]=value;trackEvent('quiz_answer',{question_key:q.key,step_number:step+1});
+   step++;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;$('name').focus({preventScroll:true});
+  });
+  input.addEventListener('input',()=>{err.textContent='';});
+  options.append(input,next);
+ }else{
  q.options.forEach(pair=>{
   const b=document.createElement('button'); b.type='button'; b.className='opt';
   const selected=state[q.key]===pair[0];
@@ -1119,6 +1135,7 @@ function draw(){
   });
   options.append(b);
  });
+ }
  $('prev').disabled=step===0;
  err.textContent='';
 }
