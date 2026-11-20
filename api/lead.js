@@ -23,10 +23,19 @@ const labels = {
   lead_contact_permission: {most:'Yes, most',some:'Some',not_sure:'Not sure'},
   lead_storage: {phone:'Phone',crm:'CRM',spreadsheet:'Spreadsheet',paper:'Paper'}
 };
+const answersV2 = {"old_leads":["under_50","50_100","100_250","250_plus"],"average_job_size":["under_5k","5k_15k","15k_30k","30k_plus"],"lead_storage":["crm","spreadsheet","phone","email","not_sure"],"start_timing":["right_away","next_30_days","researching"]};
+const labelsV2 = {"old_leads":{"under_50":"Under 50","50_100":"50-100","100_250":"100-250","250_plus":"250+"},"average_job_size":{"under_5k":"Under $5K","5k_15k":"$5-15K","15k_30k":"$15-30K","30k_plus":"$30K+"},"lead_storage":{"crm":"CRM like GHL or Jobber","spreadsheet":"Spreadsheet","phone":"Phone or texts","email":"Email","not_sure":"Not sure"},"start_timing":{"right_away":"Right away","next_30_days":"In the next 30 days","researching":"Just looking for now"}};
 function text(value,max){return typeof value === 'string'?value.trim().slice(0,max):'';}
 function valid(value,min,max){return typeof value==='string'&&value.trim().length>=min&&value.trim().length<=max;}
 function respond(res,status,data){res.setHeader('Cache-Control','no-store');return res.status(status).json(data);}
 function determineRoute(data){
+  if(data.funnel_version==='revival_v2'){
+    if(data.average_job_size==='under_5k')return 'disqualified';
+    if(data.start_timing==='researching')return 'nurture';
+    if(['under_50','50_100'].includes(data.old_leads))return '90_day_system';
+    if(data.average_job_size==='5k_15k')return 'manual_review';
+    return 'revival_997';
+  }
   if(['under_15k','15k_30k'].includes(data.monthly_revenue) ||
     data.average_job_size==='under_5k' ||
     data.monthly_marketing_budget==='under_500' ||
@@ -45,11 +54,14 @@ module.exports=async function handler(req,res){
   if(typeof data==='string'){try{data=JSON.parse(data);}catch{return respond(res,400,{error:'Invalid request'});}}
   if(!data||typeof data!=='object'||Array.isArray(data))return respond(res,400,{error:'Invalid request'});
   if(data.other_field)return respond(res,201,{ok:true});
-  if(data.funnel_version!=='revival_v1')return respond(res,400,{error:'Unrecognized application version'});
-  for(const [key,allowed] of Object.entries(answers)){
+  if(!['revival_v1','revival_v2'].includes(data.funnel_version))return respond(res,400,{error:'Unrecognized application version'});
+  const isV2=data.funnel_version==='revival_v2';
+  const activeAnswers=isV2?answersV2:answers;
+  const activeLabels=isV2?labelsV2:labels;
+  for(const [key,allowed] of Object.entries(activeAnswers)){
     if(!allowed.includes(data[key]))return respond(res,400,{error:'Please complete all qualification questions',field:key});
   }
-  if(!valid(data.growth_blocker,3,1500))return respond(res,400,{error:'Please describe what is holding your growth back',field:'growth_blocker'});
+  if(!isV2&&!valid(data.growth_blocker,3,1500))return respond(res,400,{error:'Please describe what is holding your growth back',field:'growth_blocker'});
   const fullName=text(data.name,160).replace(/\s+/g,' ');
   const nameParts=fullName.split(' ');
   const firstName=nameParts.shift()||'';
@@ -72,10 +84,10 @@ module.exports=async function handler(req,res){
   const record={
     first_name:firstName,last_name:lastName||null,business_name:text(data.business_name,150),
     email:text(data.email,200).toLowerCase(),phone:'+1'+national,
-    monthly_revenue:data.monthly_revenue,old_leads:data.old_leads,average_job_size:data.average_job_size,
-    monthly_marketing_budget:data.monthly_marketing_budget,decision_maker:data.decision_maker,
-    start_timing:data.start_timing,lead_contact_permission:data.lead_contact_permission,
-    lead_storage:data.lead_storage,growth_blocker:text(data.growth_blocker,1500),
+    monthly_revenue:isV2?null:data.monthly_revenue,old_leads:data.old_leads,average_job_size:data.average_job_size,
+    monthly_marketing_budget:isV2?null:data.monthly_marketing_budget,decision_maker:isV2?null:data.decision_maker,
+    start_timing:data.start_timing,lead_contact_permission:isV2?null:data.lead_contact_permission,
+    lead_storage:data.lead_storage,growth_blocker:isV2?null:text(data.growth_blocker,1500),
     consent:true,source:'revival_funnel',
     utm_source:text(data.utm_source,100)||null,
     utm_medium:text(data.utm_medium,100)||null,
@@ -92,20 +104,20 @@ module.exports=async function handler(req,res){
     if(webhookUrl){
       const hookPayload={
         event_type:edit?'revival_application_updated':'revival_application_submitted',
-        source:'Ignite Revival Funnel',funnel_version:'revival_v1',submission_id:submissionId,
+        source:'Ignite Revival Funnel',funnel_version:'revival_v1',quiz_version:data.funnel_version,submission_id:submissionId,
         first_name:firstName,last_name:lastName||null,name:fullName,
         business_name:record.business_name,company_name:record.business_name,
         email:record.email,phone:record.phone,
-        ...Object.fromEntries(Object.keys(answers).flatMap(field=>[[field,record[field]],[field+'_text',labels[field][record[field]]]])),
+        ...Object.fromEntries(Object.keys(answers).flatMap(field=>[[field,record[field]],[field+'_text',activeLabels[field]?.[record[field]]??null]])),
         growth_blocker:record.growth_blocker,
         offer_route:route,lead_segment:route,qualified_for_call:['90_day_system','revival_997'].includes(route),
-        partner_required:data.decision_maker==='with_partner',
+        partner_required:!isV2&&data.decision_maker==='with_partner',
         manual_review_required:route==='manual_review',
         nurture_only:route==='nurture',
         disqualified:route==='disqualified',
         consent:true,
         // Consent to contact the applicant is not proof that their old contacts opted into outreach.
-        old_list_permission_review_required:data.lead_contact_permission!=='most',
+        old_list_permission_review_required:isV2||data.lead_contact_permission!=='most',
         verify_individual_outreach_consent_before_reactivation:true,
         utm_source:record.utm_source,utm_medium:record.utm_medium,utm_campaign:record.utm_campaign
       };
@@ -114,6 +126,6 @@ module.exports=async function handler(req,res){
         if(!delivery.ok)console.error('Revival GHL webhook returned',delivery.status);
       }catch(e){console.error('Revival GHL webhook failure',e?.name||'UnknownError');}
     }else console.error('Revival GHL webhook not configured');
-    return respond(res,edit?200:201,{ok:true,submission_id:submissionId,edit_token:editToken,offer_route:route,partner_required:data.decision_maker==='with_partner'});
+    return respond(res,edit?200:201,{ok:true,submission_id:submissionId,edit_token:editToken,offer_route:route,partner_required:!isV2&&data.decision_maker==='with_partner'});
   }catch(e){console.error('Revival submission error',e?.name||'UnknownError');return respond(res,503,{error:'Could not save application right now'});}
 };

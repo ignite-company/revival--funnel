@@ -848,7 +848,7 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
  <div class="ignite-video-frame"><div class="ignite-video-box"><video id="ignite-client-video" controls autoplay playsinline preload="metadata" aria-label="Ignite client testimonial"><source src="https://assets.cdn.filesafe.space/bF1dT8IAVuvat84LkAVe/media/6a336b225408771d165c7749.mp4" type="video/mp4">Your browser does not support video playback.</video><button type="button" id="ignite-unmute" class="ignite-unmute hidden" aria-label="Play video with sound">🔊 Tap for sound</button></div></div>
  <div class="ignite-primary-cta ignite-after-video"><button class="ignite-white-cta ignite-open-quiz" type="button">See If My List Qualifies</button><p>60-SECOND APPLICATION · QUALIFICATION AND WRITTEN TERMS APPLY</p></div>
 </div></section>
-<div class="quiz-overlay hidden" id="quiz-overlay"><div class="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title" tabindex="-1"><div class="ignite-modal-bar"><span id="quiz-modal-title">See If Your Old Lead List Qualifies</span><button type="button" id="ignite-quiz-close" aria-label="Close application">✕</button></div><div class="quiz-scroll"><section class="section qualification"><div class="container"><div class="quiz" id="quiz"><div class="quiz-top"><strong id="quiz-step-title">About your old leads</strong><span id="quiz-step-count">Step 1 of 10</span><span class="secure-text">🔒 Secure</span></div><div class="progress"><div class="progress-bar" id="quiz-progress"></div></div>
+<div class="quiz-overlay hidden" id="quiz-overlay"><div class="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title" tabindex="-1"><div class="ignite-modal-bar"><span id="quiz-modal-title">See If Your Old Lead List Qualifies</span><button type="button" id="ignite-quiz-close" aria-label="Close application">✕</button></div><div class="quiz-scroll"><section class="section qualification"><div class="container"><div class="quiz" id="quiz"><div class="quiz-top"><strong id="quiz-step-title">About your old leads</strong><span id="quiz-step-count">Step 1 of 5</span><span class="secure-text">🔒 Secure</span></div><div class="progress"><div class="progress-bar" id="quiz-progress"></div></div>
 <div class="quiz-body">
 <div id="question-view"><h3 id="question" class="q-title"></h3><p id="question-desc" class="q-desc"></p><div id="options" class="options"></div><p class="error" id="quiz-error" role="alert"></p><div class="quiz-actions"><button class="linkbtn" type="button" id="prev" disabled>← Back</button><span class="quiz-auto-note">Select an answer to continue</span></div></div>
 <form id="contact-form" class="hidden" novalidate><h3 class="q-title">Where can we reach you?</h3><p class="q-desc">Tell us how to reach you with the next step for your application.</p><div class="formgrid">
@@ -1008,11 +1008,11 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 function trackEvent(name,properties={}){
  if(typeof window.gtag==='function')window.gtag('event',name,properties);
 }
-const steps=[{"key":"monthly_revenue","title":"What is your monthly revenue?","desc":"Choose your average monthly revenue.","options":[["under_15k","Under $15K"],["15k_30k","$15K–$30K"],["30k_60k","$30K–$60K"],["60k_100k","$60K–$100K"],["100k_plus","$100K+"]]},{"key":"old_leads","title":"How many old estimates and leads do you have in the last 12 months?","desc":"Include old quotes, missed calls and inquiries that never turned into jobs.","options":[["under_50","Under 50"],["50_100","50–100"],["100_250","100–250"],["250_500","250–500"],["500_plus","500+"]]},{"key":"average_job_size","title":"What is your average job size?","desc":"How much is a typical signed project worth?","options":[["under_5k","Under $5K"],["5k_10k","$5K–$10K"],["10k_25k","$10K–$25K"],["25k_plus","$25K+"]]},{"key":"monthly_marketing_budget","title":"What is your monthly ad and marketing budget?","desc":"Include current spending on ads and lead generation.","options":[["under_500","Under $500"],["500_1k","$500–$1K"],["1k_2_5k","$1K–$2.5K"],["2_5k_plus","$2.5K+"]]},{"key":"decision_maker","title":"Are you the decision maker?","desc":"Anyone who needs to approve the system should attend the call.","options":[["yes","Yes"],["with_partner","Yes, with a partner"],["no","No"]]},{"key":"start_timing","title":"When do you want to start?","desc":"Choose the timing that fits your plans.","options":[["this_month","This month"],["next_60_days","Next 60 days"],["researching","Just researching"]]},{"key":"lead_contact_permission","title":"Did these leads agree to hear from you by text or email?","desc":"We will check contact permissions before reaching out to old leads.","options":[["most","Yes, most"],["some","Some"],["not_sure","Not sure"]]},{"key":"lead_storage","title":"Where do the old leads live?","desc":"This helps us understand how your leads are stored.","options":[["phone","Phone"],["crm","CRM"],["spreadsheet","Spreadsheet"],["paper","Paper"]]},{"key":"growth_blocker","title":"What's the biggest thing holding your growth back?","desc":"Tell us in your own words so we can understand your situation.","type":"text"}];
+const steps=[{"key":"old_leads","title":"How many old leads or unsigned estimates do you have from the last 12 months?","desc":"Include old leads and estimates that never turned into jobs.","options":[["under_50","Under 50"],["50_100","50-100"],["100_250","100-250"],["250_plus","250+"]]},{"key":"average_job_size","title":"What's your average job size?","desc":"Choose the value of a typical job.","options":[["under_5k","Under $5K"],["5k_15k","$5-15K"],["15k_30k","$15-30K"],["30k_plus","$30K+"]]},{"key":"lead_storage","title":"Where are those leads saved right now?","desc":"Choose where most of your old leads are stored.","options":[["crm","CRM like GHL or Jobber"],["spreadsheet","Spreadsheet"],["phone","Phone or texts"],["email","Email"],["not_sure","Not sure"]]},{"key":"start_timing","title":"When would you want to start getting jobs back from your old leads?","desc":"Choose when you'd like to get started.","options":[["right_away","Right away"],["next_30_days","In the next 30 days"],["researching","Just looking for now"]]}];
 const state={};let step=0,submitting=false,isAdvancing=false,advanceTimer=null;
 const $=id=>document.getElementById(id),question=$('question'),desc=$('question-desc'),options=$('options'),err=$('quiz-error');
 /* Qualification questions are presented inside an accessible popup. */
-const optionEmoji={"under_15k":"📊","15k_30k":"📈","30k_60k":"💰","60k_100k":"🚀","100k_plus":"🏆","under_50":"📱","50_100":"📋","100_250":"🗂️","250_500":"📚","500_plus":"📦","under_5k":"🛠️","5k_10k":"🏡","10k_25k":"🏠","25k_plus":"🏗️","under_500":"🌱","500_1k":"📢","1k_2_5k":"📣","2_5k_plus":"📈","yes":"✅","with_partner":"🤝","no":"👥","this_month":"🚀","next_60_days":"📅","researching":"🔎","most":"✅","some":"📝","not_sure":"❓","phone":"📱","crm":"💻","spreadsheet":"📊","paper":"🗃️"};
+const optionEmoji={"under_50":"📱","50_100":"📋","100_250":"🗂️","250_plus":"📚","under_5k":"🛠️","5k_15k":"🏡","15k_30k":"🏠","30k_plus":"🏗️","crm":"💻","spreadsheet":"📊","phone":"📱","email":"✉️","not_sure":"❓","right_away":"🚀","next_30_days":"📅","researching":"🔎"};
 let quizStarted=false;
 
 function phoneDigits(value){
@@ -1087,21 +1087,6 @@ function draw(){
  question.textContent=q.title;
  desc.textContent=q.desc;
  options.textContent='';
- if(q.type==='text'){
-  const input=document.createElement('textarea');
-  input.id='revival-growth-blocker';input.className='revival-textarea';input.rows=5;input.maxLength=1500;
-  input.setAttribute('aria-label','What is holding your growth back?');
-  input.placeholder='For example, we send estimates but rarely hear back from homeowners...';
-  input.value=state[q.key]||'';
-  const next=document.createElement('button');next.type='button';next.className='cta revival-continue';next.textContent='Continue';
-  next.addEventListener('click',()=>{
-   const value=input.value.trim();if(value.length<3){err.textContent='Please share a few words about your biggest challenge.';input.focus();return;}
-   state[q.key]=value;trackEvent('quiz_answer',{question_key:q.key,step_number:step+1});
-   step++;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;$('name').focus({preventScroll:true});
-  });
-  input.addEventListener('input',()=>{err.textContent='';});
-  options.append(input,next);
- }else{
  q.options.forEach(pair=>{
   const b=document.createElement('button'); b.type='button'; b.className='opt';
   const selected=state[q.key]===pair[0];
@@ -1133,7 +1118,6 @@ function draw(){
   });
   options.append(b);
  });
- }
  $('prev').disabled=step===0;
  err.textContent='';
 }
@@ -1143,7 +1127,7 @@ $('contact-form').addEventListener('submit',async e=>{e.preventDefault();if(subm
 const data=new FormData(form),query=new URLSearchParams(window.location.search);
 const previousReceipt=readSubmission();
 const contactRecord={name:String(data.get('name')||'').trim(),phone:normalizeUSPhone(data.get('phone'))||String(data.get('phone')||'').trim(),email:String(data.get('email')||'').trim(),business_name:String(data.get('business_name')||'').trim()};
-const payload={...state,funnel_version:'revival_v1',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
+const payload={...state,funnel_version:'revival_v2',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
 submitting=true;$('submit').disabled=true;$('submit').textContent='Saving your application…';
 try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),16000);let response;try{response=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});}finally{clearTimeout(timeout);}
 if(!response.ok){let detail;try{detail=await response.json();}catch{}throw new Error(detail?.error || 'Could not save your application. Please try again.')}
@@ -1153,7 +1137,7 @@ if(!receipt.ok||!receipt.submission_id||!receipt.edit_token)throw new Error('Una
 // Editing an existing submission must not inflate conversion counts.
 if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead');
 trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});
-window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v1',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
+window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v2',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
 if(['90_day_system','revival_997'].includes(receipt.offer_route))showBookingStep(receipt.offer_route,receipt.partner_required);
 else showOutcome(receipt.offer_route,receipt.partner_required);
 $('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});}
@@ -1180,7 +1164,7 @@ function showBookingStep(route,partnerRequired){
  $('result-view').classList.add('hidden');
  $('booking-heading').textContent=route==='90_day_system'?'Book a strategy call for your 90-day follow-up system.':'Book your reactivation strategy call.';
  $('revival-partner-note').classList.toggle('hidden',!partnerRequired);
- $('revival-permission-note').classList.toggle('hidden',state.lead_contact_permission==='most');
+ $('revival-permission-note').classList.toggle('hidden',false);
  trackEvent('booking_calendar_view',{booking_provider:'highlevel'});
  $('question-view').classList.add('hidden');
  $('contact-form').classList.add('hidden');
@@ -1192,7 +1176,7 @@ function showBookingStep(route,partnerRequired){
  $('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
  if(!$('quiz-overlay').classList.contains('hidden'))$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;
 }
-function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteRevivalSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='revival_v1'&&typeof r.answers?.monthly_revenue==='string'&&typeof r.answers?.growth_blocker==='string')return r;}catch{}return null;}
+function readSubmission(){try{const r=JSON.parse(window.sessionStorage.getItem('igniteRevivalSubmission')||'null');if(r&&r.submission_id&&r.edit_token&&r.funnel_version==='revival_v2'&&steps.every(q=>q.options.some(([key])=>key===r.answers?.[q.key])))return r;}catch{}return null;}
 function returnToAnswers(){$('booking-reveal').classList.add('hidden');$('result-view').classList.add('hidden');step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});question.setAttribute('tabindex','-1');question.focus({preventScroll:true});}
 $('booking-back').addEventListener('click',returnToAnswers);
 const previous=readSubmission();
