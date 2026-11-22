@@ -877,6 +877,9 @@ body.quiz-open{overflow:hidden!important}
  #hero-heading .ignite-headline-primary{font-size:var(--headline-fit,clamp(18px,5.2vw,39px))!important;letter-spacing:-.04em!important}
  #hero-heading .ignite-headline-secondary{font-size:var(--headline-fit,clamp(14px,4.1vw,28px))!important;letter-spacing:-.025em!important}
 }
+/* Keep the VSL immediately below the subheadline after removing the revenue badge. */
+.ignite-vsl-heading{margin-top:12px!important}
+@media(max-width:767px){.ignite-vsl-heading{margin-top:8px!important}}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -939,7 +942,6 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 })();
 </script>
  <p class="hero-subheadline">Turn the leads you already have into booked jobs without spending more on marketing.</p>
- <div class="ignite-hero-proof" aria-label="$1 million in project revenue"><span class="proof-value">$1M</span><span>in Project Revenue</span></div>
  <h2 class="ignite-video-heading ignite-vsl-heading">WATCH THIS FIRST</h2>
  <div class="ignite-video-frame ignite-vsl-frame"><div class="ignite-video-box"><video id="ignite-client-video" controls autoplay muted playsinline webkit-playsinline preload="metadata" src="/media/revival-vsl.mp4" aria-label="Ignite sales video">Your browser does not support video playback.</video><button type="button" id="ignite-unmute" class="ignite-unmute" aria-label="Play video with sound"><span id="ignite-vsl-sound-status">Watch this video</span><strong id="ignite-vsl-sound-action">Press to play with sound</strong></button></div></div>
  <div class="ignite-primary-cta ignite-after-video"><button class="ignite-white-cta ignite-open-quiz" type="button">See If My List Qualifies</button><p>60-SECOND APPLICATION · QUALIFICATION AND WRITTEN TERMS APPLY</p></div>
@@ -1355,10 +1357,10 @@ function updateVideoSoundButton(){
  const playing=!igniteVideo.paused&&!igniteVideo.ended&&igniteVideo.readyState>=2;
  const silent=igniteVideo.muted||igniteVideo.volume===0;
  const needsPrompt=failed||silent||!firstFrame;
- igniteSoundButton.classList.toggle('hidden',igniteVideo.ended||!needsPrompt);
- vslStatus.textContent=failed?'Video could not load':playing?'Your video is playing':'Watch this video';
+ igniteSoundButton.classList.toggle('hidden',!needsPrompt);
+ vslStatus.textContent=failed?'Video could not load':playing?'Your video is playing':igniteVideo.ended?'Watch from the beginning':'Watch this video';
  vslAction.textContent=failed?'Tap to retry':playing?'Press to unmute':'Press to play with sound';
- igniteSoundButton.setAttribute('aria-label',failed?'Retry video':playing?'Unmute video':'Play video with sound');
+ igniteSoundButton.setAttribute('aria-label',failed?'Retry video':'Restart video from the beginning with sound');
 }
 function markFirstFrame(){
  if(igniteVideo.readyState<2)return;
@@ -1388,6 +1390,7 @@ function startVsl(index,withGesture){
   igniteVideo.src=vslSources[index];
   igniteVideo.load();
  }
+ if(withGesture){try{igniteVideo.currentTime=0;}catch{}}
  igniteVideo.muted=false;igniteVideo.volume=1;
  setLoadWatchdog();
  if(!withGesture)soundTimer=setTimeout(()=>tryMuted(generation),850);
@@ -1410,9 +1413,12 @@ igniteVideo.addEventListener('error',()=>{
 });
 igniteSoundButton.addEventListener('click',()=>{
  if(failed){startVsl(sourceIndex===0?1:0,true);return;}
- ++playbackGeneration;clearTimeout(soundTimer);userRequestedSound=true;
+ const generation=++playbackGeneration;clearTimeout(soundTimer);userRequestedSound=true;
+ // Seek before enabling audio so the viewer never hears a later segment first.
+ igniteVideo.pause();
+ try{igniteVideo.currentTime=0;}catch{}
  igniteVideo.muted=false;igniteVideo.volume=1;
- igniteVideo.play().catch(()=>{updateVideoSoundButton();});
+ igniteVideo.play().catch(()=>{if(generation===playbackGeneration){userRequestedSound=false;igniteVideo.muted=true;updateVideoSoundButton();}});
  if(!firstFrame)setLoadWatchdog();
  updateVideoSoundButton();
 });
