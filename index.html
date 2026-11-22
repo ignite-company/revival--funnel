@@ -869,13 +869,13 @@ body.quiz-open{overflow:hidden!important}
 #hero-heading .ignite-headline-promise,#hero-heading .ignite-headline-guarantee,#hero-heading .ignite-headline-primary,#hero-heading .ignite-headline-secondary,#hero-heading .ignite-headline-gradient{white-space:nowrap!important;text-wrap:nowrap!important;overflow-wrap:normal!important;max-width:none!important}
 #hero-heading .ignite-headline-promise{font-size:var(--headline-fit,clamp(19px,2.3vw,28px))!important;line-height:1.16!important;letter-spacing:-.01em!important}
 #hero-heading .ignite-headline-primary{font-size:var(--headline-fit,clamp(30px,4.5vw,55px))!important;line-height:1.08!important}
-#hero-heading .ignite-headline-secondary{font-size:var(--headline-fit,clamp(18px,2.4vw,27px))!important;line-height:1.14!important;margin-top:5px!important}
+#hero-heading .ignite-headline-secondary{font-size:var(--headline-fit,clamp(16px,2.1vw,23px))!important;line-height:1.14!important;margin-top:5px!important}
 #hero-heading .ignite-headline-guarantee{margin-top:4px!important}
 @media(max-width:767px){
  .hero h1#hero-heading{width:calc(100% + 12px)!important;margin:5px -6px 0!important}
  #hero-heading .ignite-headline-promise{font-size:var(--headline-fit,clamp(12px,3.5vw,25px))!important;letter-spacing:-.025em!important}
  #hero-heading .ignite-headline-primary{font-size:var(--headline-fit,clamp(18px,5.2vw,39px))!important;letter-spacing:-.04em!important}
- #hero-heading .ignite-headline-secondary{font-size:var(--headline-fit,clamp(14px,4.1vw,28px))!important;letter-spacing:-.025em!important}
+ #hero-heading .ignite-headline-secondary{font-size:var(--headline-fit,clamp(13px,3.8vw,20px))!important;letter-spacing:-.025em!important}
 }
 /* Keep the VSL immediately below the subheadline after removing the revenue badge. */
 .ignite-vsl-heading{margin-top:12px!important}
@@ -912,7 +912,7 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 
 </div></header>
 <section class="hero" aria-labelledby="hero-heading"><div class="container">
- <h1 id="hero-heading"><span class="ignite-headline-promise" style="text-transform:none"><span class="ignite-headline-gradient">We'll Turn Your Old Leads and Unsigned Estimates</span></span> <span class="ignite-headline-guarantee"><span class="ignite-headline-primary">Into 5+ Booked Jobs in 30 Days,</span> <span class="ignite-headline-secondary">or We Work for Free Until We Do</span></span></h1>
+ <h1 id="hero-heading"><span class="ignite-headline-promise" style="text-transform:none"><span class="ignite-headline-gradient">We'll Turn Your Old Leads and Unsigned Estimates</span></span> <span class="ignite-headline-guarantee"><span class="ignite-headline-primary">Into 5+ Booked Jobs in 30 Days,</span> <span class="ignite-headline-secondary">or You Get a Full Refund.</span></span></h1>
 <script>
 /* Fit each existing headline phrase to one full-width line, including after fonts load. */
 (function(){
@@ -922,7 +922,7 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
   const width=heading.clientWidth-4;
   if(width<=0)return;
   const mobile=window.matchMedia('(max-width:767px)').matches;
-  const caps=mobile?[25,39,28]:[28,55,27];
+  const caps=mobile?[25,39,20]:[28,55,23];
   rows.forEach(function(row,index){
    const range=document.createRange();
    range.selectNodeContents(row);
