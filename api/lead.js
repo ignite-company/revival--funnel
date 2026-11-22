@@ -72,9 +72,13 @@ module.exports=async function handler(req,res){
   const national=digits.length===11&&digits.startsWith('1')?digits.slice(1):digits;
   if(!/^\d{10}$/.test(national))return respond(res,400,{error:'Please provide a valid 10-digit US phone number'});
   if(data.consent!==true)return respond(res,400,{error:'Contact permission is required'});
-  const url=process.env.SUPABASE_URL;
-  const key=process.env.SUPABASE_PUBLISHABLE_KEY;
-  if(!url||!key){console.error('Revival funnel Supabase configuration missing');return respond(res,503,{error:'Application service unavailable'});}
+  // The verified project uses a public publishable key, constrained by insert-only RLS.
+  // Use matching deployment variables when present; a missing Vercel env cannot break intake.
+  const projectUrl="https://ujvuqbgheewbyvfusqvz.supabase.co";
+  const configuredUrl=String(process.env.SUPABASE_URL||'').replace(/\/$/,'');
+  const useConfigured= configuredUrl===projectUrl && !!process.env.SUPABASE_PUBLISHABLE_KEY;
+  const url=projectUrl;
+  const key=useConfigured?process.env.SUPABASE_PUBLISHABLE_KEY:"sb_publishable_8KHlNu2WyrvkgYF_Vm-jYQ_EsOFrzaO";
   const edit=Boolean(data.submission_id||data.edit_token);
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if(edit&&(!uuid.test(data.submission_id||'')||!uuid.test(data.edit_token||'')))return respond(res,400,{error:'Invalid edit session'});
