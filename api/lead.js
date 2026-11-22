@@ -81,6 +81,19 @@ module.exports=async function handler(req,res){
   const submissionId=edit?data.submission_id:randomUUID();
   const editToken=edit?data.edit_token:randomUUID();
   const route=determineRoute(data);
+  // Whitelist attribution fields; never trust browser-provided routing or event timestamps.
+  const attrInput=data.attribution&&typeof data.attribution==='object'&&!Array.isArray(data.attribution)?data.attribution:{};
+  const attrLimits={fbclid:512,fbc:640,fbp:160,utm_content:220,utm_term:220,ad_id:80,ad_name:220,adset_id:80,adset_name:220,campaign_id:80,campaign_name:220,placement:100,site_source_name:80,landing_page:400,click_captured_at:40};
+  const attribution={};
+  for(const [field,limit] of Object.entries(attrLimits)){
+    const value=text(attrInput[field]||data[field],limit);
+    if(value&&!value.includes('{{'))attribution[field]=value;
+  }
+  if(attribution.fbc&&!/^fb\.\d+\.\d{10,16}\.[A-Za-z0-9_-]+$/.test(attribution.fbc))delete attribution.fbc;
+  if(attribution.fbp&&!/^fb\.\d+\.\d{10,16}\.\d+$/.test(attribution.fbp))delete attribution.fbp;
+  if(attribution.fbclid&&!/^[A-Za-z0-9_-]+$/.test(attribution.fbclid))delete attribution.fbclid;
+  const webhookContext={delivery_version:'2',quiz_version:data.funnel_version};
+  for(const field of Object.keys(answers))webhookContext[field+'_text']=activeLabels[field]?.[data[field]]??null;
   const record={
     first_name:firstName,last_name:lastName||null,business_name:text(data.business_name,150),
     email:text(data.email,200).toLowerCase(),phone:'+1'+national,
@@ -91,7 +104,8 @@ module.exports=async function handler(req,res){
     consent:true,source:'revival_funnel',
     utm_source:text(data.utm_source,100)||null,
     utm_medium:text(data.utm_medium,100)||null,
-    utm_campaign:text(data.utm_campaign,100)||null
+    utm_campaign:text(data.utm_campaign,100)||null,
+    attribution,webhook_context:webhookContext
   };
   const endpoint=url.replace(/\/$/,'')+(edit?'/rest/v1/rpc/update_revival_funnel_application':'/rest/v1/revival_funnel_leads');
   const headers={'Content-Type':'application/json','apikey':key,'Prefer':'return=minimal'};
@@ -100,32 +114,8 @@ module.exports=async function handler(req,res){
     const db=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(edit?{p_id:submissionId,p_token:editToken,p_data:record}:{...record,id:submissionId,edit_token:editToken}),signal:AbortSignal.timeout(9000)});
     if(!db.ok){console.error('Revival funnel insert/update returned',db.status);return respond(res,502,{error:'Could not save application right now'});}
     if(edit&&(await db.text()).trim()!=='true')return respond(res,409,{error:'Your editing session expired. Please refresh to submit again.'});
-    const webhookUrl=process.env.GHL_LEAD_WEBHOOK_URL;
-    if(webhookUrl){
-      const hookPayload={
-        event_type:edit?'revival_application_updated':'revival_application_submitted',
-        source:'Ignite Revival Funnel',funnel_version:'revival_v1',quiz_version:data.funnel_version,submission_id:submissionId,
-        first_name:firstName,last_name:lastName||null,name:fullName,
-        business_name:record.business_name,company_name:record.business_name,
-        email:record.email,phone:record.phone,
-        ...Object.fromEntries(Object.keys(answers).flatMap(field=>[[field,record[field]],[field+'_text',activeLabels[field]?.[record[field]]??null]])),
-        growth_blocker:record.growth_blocker,
-        offer_route:route,lead_segment:route,qualified_for_call:['90_day_system','revival_997'].includes(route),
-        partner_required:!isV2&&data.decision_maker==='with_partner',
-        manual_review_required:route==='manual_review',
-        nurture_only:route==='nurture',
-        disqualified:route==='disqualified',
-        consent:true,
-        // Consent to contact the applicant is not proof that their old contacts opted into outreach.
-        old_list_permission_review_required:isV2||data.lead_contact_permission!=='most',
-        verify_individual_outreach_consent_before_reactivation:true,
-        utm_source:record.utm_source,utm_medium:record.utm_medium,utm_campaign:record.utm_campaign
-      };
-      try{
-        const delivery=await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(hookPayload),signal:AbortSignal.timeout(6000)});
-        if(!delivery.ok)console.error('Revival GHL webhook returned',delivery.status);
-      }catch(e){console.error('Revival GHL webhook failure',e?.name||'UnknownError');}
-    }else console.error('Revival GHL webhook not configured');
+    // The Supabase trigger queues the configured GHL webhook after the transaction commits.
+    // No second POST here: one delivery per inserted/edited application.
     return respond(res,edit?200:201,{ok:true,submission_id:submissionId,edit_token:editToken,offer_route:route,partner_required:!isV2&&data.decision_maker==='with_partner'});
   }catch(e){console.error('Revival submission error',e?.name||'UnknownError');return respond(res,503,{error:'Could not save application right now'});}
 };
