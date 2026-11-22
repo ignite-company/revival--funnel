@@ -1272,11 +1272,11 @@ const receipt=await response.json();
 if(!receipt.ok||!receipt.submission_id||!receipt.edit_token)throw new Error('Unable to confirm saved application.');
 // Both initialized Meta datasets receive the Lead event once for a new saved application.
 // Editing an existing submission must not inflate conversion counts.
-if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead',{}, {eventID:'revival_lead_'+receipt.submission_id});
-trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});
-window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v2',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
-if(['90_day_system','revival_997'].includes(receipt.offer_route))showBookingStep(receipt.offer_route,receipt.partner_required);
-else showOutcome(receipt.offer_route,receipt.partner_required);
+try{if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead',{}, {eventID:'revival_lead_'+receipt.submission_id});}catch{}
+try{trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});}catch{}
+try{window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v2',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));}catch{}
+// Every saved application proceeds to booking; qualification stays available to CRM routing.
+showBookingStep(receipt.offer_route,receipt.partner_required);
 $('quiz-overlay').querySelector('.quiz-scroll').scrollTo({top:0,behavior:'smooth'});}
 catch(ex){fe.textContent=ex.name==='AbortError'?'The request timed out. Please try again.':ex.message||'Unable to save. Please try again.'}finally{submitting=false;$('submit').disabled=false;$('submit').textContent='Submit My Answers →'}});
 
@@ -1302,7 +1302,7 @@ function showBookingStep(route,partnerRequired){
  $('booking-heading').textContent=route==='90_day_system'?'Book a strategy call for your 90-day follow-up system.':'Book your reactivation strategy call.';
  $('revival-partner-note').classList.toggle('hidden',!partnerRequired);
  $('revival-permission-note').classList.toggle('hidden',false);
- trackEvent('booking_calendar_view',{booking_provider:'highlevel'});
+ try{trackEvent('booking_calendar_view',{booking_provider:'highlevel'});}catch{}
  $('question-view').classList.add('hidden');
  $('contact-form').classList.add('hidden');
  $('booking-reveal').classList.remove('hidden');
@@ -1324,8 +1324,7 @@ if(previous&&previous.answers&&previous.contact){
  for(const key of ['phone','email','business_name']){const value=previous.contact[key];if(typeof value==='string') $('contact-form').elements.namedItem(key).value=value;}
  $('phone').value=formatUSPhone($('phone').value);
  $('consent').checked=true;
- if(['90_day_system','revival_997'].includes(previous.offer_route))showBookingStep(previous.offer_route,previous.partner_required);
- else showOutcome(previous.offer_route,previous.partner_required);
+ showBookingStep(previous.offer_route,previous.partner_required);
 }else draw();
 
 /* Track meaningful content visibility, rather than only page load. */
