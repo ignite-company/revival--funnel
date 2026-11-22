@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/media/revival-vsl.mp4",
+      "destination": "https://files.leadconnectorhq.com/file/6b023b58306ac2375165607f/997-vsl.mp4"
+    },
+    {
       "source": "/headline-a",
       "destination": "/index.html"
     },
