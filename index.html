@@ -896,6 +896,45 @@ fbq('init', '1822916335803108');
 fbq('track', 'PageView');
 </script>
 <!-- End Meta Pixel Code -->
+<script>
+/* Capture paid-ad attribution at arrival, preserve it through the quiz and refreshes. */
+(function(){
+ const key='ignite_revival_attribution_v1',ttl=30*24*60*60*1000;
+ const fields=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','ad_id','ad_name','adset_id','adset_name','campaign_id','campaign_name','placement','site_source_name'];
+ function clean(value,max){return typeof value==='string'&&!value.includes('{{')?value.trim().slice(0,max):'';}
+ function cookie(name){
+  const row=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith(name+'='));
+  if(!row)return '';
+  try{return decodeURIComponent(row.slice(name.length+1));}catch{return row.slice(name.length+1);}
+ }
+ function readStored(){for(const storageName of ['sessionStorage','localStorage']){try{const r=JSON.parse(window[storageName].getItem(key)||'null');if(r&&r.saved_at&&Date.now()-r.saved_at<ttl)return r;}catch{}}return {};}
+ function store(record){for(const storageName of ['sessionStorage','localStorage']){try{window[storageName].setItem(key,JSON.stringify(record));}catch{}}}
+ const params=new URLSearchParams(location.search);
+ const incoming={};
+ fields.forEach(field=>{const v=clean(params.get(field),field==='fbclid'?512:220);if(v)incoming[field]=v;});
+ let saved=readStored();
+ const changedClick=incoming.fbclid&&incoming.fbclid!==saved.fbclid;
+ const changedAd=incoming.ad_id&&incoming.ad_id!==saved.ad_id;
+ const newVisit=changedClick||changedAd||(!saved.saved_at&&Object.keys(incoming).length>0);
+ if(newVisit){saved={...incoming,saved_at:Date.now(),click_captured_at:new Date().toISOString(),landing_page:location.origin+location.pathname};}
+ else if(Object.keys(incoming).length){saved={...saved,...incoming,saved_at:saved.saved_at||Date.now()};}
+ if(!saved.saved_at){saved={saved_at:Date.now(),landing_page:location.origin+location.pathname};}
+ if(saved.fbclid){
+  const realFbc=clean(cookie('_fbc'),640);
+  saved.fbc=realFbc&&realFbc.endsWith('.'+saved.fbclid)?realFbc:(saved.fbc&&saved.fbc.endsWith('.'+saved.fbclid)?saved.fbc:'fb.1.'+saved.saved_at+'.'+saved.fbclid);
+ }
+ store(saved);
+ window.getRevivalAttribution=function(){
+  const result={...saved};
+  const fbp=clean(cookie('_fbp'),160),fbc=clean(cookie('_fbc'),640);
+  if(fbp)result.fbp=fbp;
+  if(fbc&&(!result.fbclid||fbc.endsWith('.'+result.fbclid)))result.fbc=fbc;
+  if(!result.fbclid&&result.fbc){const match=result.fbc.match(/^fb\.\d+\.\d+\.(.+)$/);if(match)result.fbclid=clean(match[1],512);}
+  delete result.saved_at;
+  return result;
+ };
+})();
+</script>
 </head>
 <body>
 <!-- Meta Pixel noscript fallback -->
@@ -1222,10 +1261,10 @@ function draw(){
 $('prev').addEventListener('click',()=>{if(isAdvancing)return;if(step>0){step--;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;}});
 $('contact-prev').addEventListener('click',()=>{step=steps.length-1;draw();$('quiz-overlay').querySelector('.quiz-scroll').scrollTop=0;});
 $('contact-form').addEventListener('submit',async e=>{e.preventDefault();if(submitting)return;const form=e.currentTarget;const fe=$('form-error');fe.textContent='';phoneInput.setCustomValidity(normalizeUSPhone(phoneInput.value)?'':'Enter a valid 10-digit US phone number.');if(!form.reportValidity()){fe.textContent='Please complete the required contact details.';return;}if(!$('consent').checked){fe.textContent='Please confirm the contact consent.';return;}
-const data=new FormData(form),query=new URLSearchParams(window.location.search);
+const data=new FormData(form),attribution=window.getRevivalAttribution?window.getRevivalAttribution():{};
 const previousReceipt=readSubmission();
 const contactRecord={name:String(data.get('name')||'').trim(),phone:normalizeUSPhone(data.get('phone'))||String(data.get('phone')||'').trim(),email:String(data.get('email')||'').trim(),business_name:String(data.get('business_name')||'').trim()};
-const payload={...state,funnel_version:'revival_v2',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(query.get('utm_source')||'').slice(0,100),utm_medium:(query.get('utm_medium')||'').slice(0,100),utm_campaign:(query.get('utm_campaign')||'').slice(0,100)};
+const payload={...state,funnel_version:'revival_v2',...(previousReceipt?{submission_id:previousReceipt.submission_id,edit_token:previousReceipt.edit_token}:{}),name:contactRecord.name,phone:contactRecord.phone,email:contactRecord.email,business_name:contactRecord.business_name,consent:true,other_field:String(data.get('other_field')||''),utm_source:(attribution.utm_source||'').slice(0,100),utm_medium:(attribution.utm_medium||'').slice(0,100),utm_campaign:(attribution.utm_campaign||'').slice(0,100),attribution};
 submitting=true;$('submit').disabled=true;$('submit').textContent='Saving your application…';
 try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),16000);let response;try{response=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});}finally{clearTimeout(timeout);}
 if(!response.ok){let detail;try{detail=await response.json();}catch{}throw new Error(detail?.error || 'Could not save your application. Please try again.')}
@@ -1233,7 +1272,7 @@ const receipt=await response.json();
 if(!receipt.ok||!receipt.submission_id||!receipt.edit_token)throw new Error('Unable to confirm saved application.');
 // Both initialized Meta datasets receive the Lead event once for a new saved application.
 // Editing an existing submission must not inflate conversion counts.
-if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead');
+if(!previousReceipt && ['90_day_system','revival_997'].includes(receipt.offer_route) && typeof window.fbq==='function')window.fbq('track','Lead',{}, {eventID:'revival_lead_'+receipt.submission_id});
 trackEvent('generate_lead',{lead_source:'revival_funnel_quiz',offer_route:receipt.offer_route});
 window.sessionStorage.setItem('igniteRevivalSubmission',JSON.stringify({submission_id:receipt.submission_id,edit_token:receipt.edit_token,funnel_version:'revival_v2',answers:{...state},contact:contactRecord,offer_route:receipt.offer_route,partner_required:receipt.partner_required}));
 if(['90_day_system','revival_997'].includes(receipt.offer_route))showBookingStep(receipt.offer_route,receipt.partner_required);
