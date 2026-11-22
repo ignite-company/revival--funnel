@@ -812,6 +812,44 @@ body.quiz-open{overflow:hidden!important}
 .ignite-vsl-frame .ignite-unmute span{font-size:clamp(11px,1.8vw,14px);font-weight:650}
 .ignite-vsl-frame .ignite-unmute strong{font-size:clamp(17px,3vw,23px);line-height:1.15}
 @media(max-width:640px){.ignite-vsl-heading{margin:21px auto 11px!important}.ignite-vsl-frame .ignite-unmute{width:min(270px,calc(100% - 26px));padding:10px 13px;gap:4px}}
+/* Compact first-screen VSL hero. */
+.hero h1#hero-heading{margin-top:10px!important}
+#hero-heading .ignite-headline-promise{font-size:clamp(19px,2.3vw,28px)!important}
+#hero-heading .ignite-headline-primary{font-size:clamp(30px,4.5vw,55px)}
+#hero-heading .ignite-headline-secondary{font-size:clamp(18px,2.4vw,27px);margin-top:7px}
+.hero .hero-subheadline{margin-top:12px!important;font-size:clamp(14px,1.6vw,17px)!important;line-height:1.35!important}
+.ignite-hero-proof{margin-top:13px;padding:8px 16px;font-size:14px}
+.ignite-hero-proof .proof-value{font-size:27px}
+.ignite-vsl-heading{margin:15px auto 8px!important;font-size:18px!important}
+.ignite-vsl-frame{width:min(760px,100%)}
+.ignite-after-video{margin-top:14px}
+.ignite-after-video p{margin-top:7px}
+@media(max-width:767px){
+ .ignite-topbar{padding:5px 0 1px!important}
+ .ignite-brand img{width:32px;height:32px}
+ .ignite-brand{gap:7px}.ignite-brand>span{gap:2px}.ignite-brand small{padding:2px 5px;font-size:6px}.ignite-brand strong{font-size:15px}
+ .hero{padding:6px 0 32px!important}
+ .hero>.container{width:calc(100% - 24px)!important}
+ .hero h1#hero-heading{margin:5px auto 0!important;padding:0!important;line-height:1.08!important}
+ #hero-heading .ignite-headline-promise{font-size:clamp(15px,4.2vw,18px)!important;line-height:1.16!important;letter-spacing:.015em!important;max-width:100%}
+ #hero-heading .ignite-headline-guarantee{margin-top:5px!important}
+ #hero-heading .ignite-headline-primary{font-size:clamp(24px,6.6vw,31px);line-height:1.08}
+ #hero-heading .ignite-headline-secondary{font-size:clamp(15px,4.3vw,19px);line-height:1.14;margin-top:5px}
+ .hero .hero-subheadline{font-size:13px!important;line-height:1.3!important;margin:9px auto 0!important;max-width:340px!important}
+ .ignite-hero-proof{padding:5px 10px;gap:5px;margin-top:9px;border-radius:8px;font-size:11px}
+ .ignite-hero-proof .proof-value{font-size:19px}
+ .ignite-vsl-heading{font-size:13px!important;margin:10px auto 6px!important;letter-spacing:.09em!important}
+ .ignite-vsl-frame{padding:2px;border-radius:12px}
+ .ignite-vsl-frame>div{border-radius:10px}
+ .ignite-after-video{margin-top:10px}
+ .ignite-after-video .ignite-white-cta{min-height:48px;padding:11px 12px;font-size:15px;border-radius:9px}
+ .ignite-after-video p{font-size:8px!important;letter-spacing:.45px;margin-top:5px!important}
+}
+@media(max-width:767px) and (max-height:650px){
+ .ignite-topbar{padding-top:3px!important}.ignite-brand img{width:26px;height:26px}
+ .ignite-vsl-frame{width:min(100%,calc((100svh - 335px) * 16 / 9))}
+ .ignite-vsl-frame .ignite-unmute{min-height:42px;padding:7px 10px}
+}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -845,10 +883,10 @@ src="https://www.facebook.com/tr?id=1822916335803108&ev=PageView&noscript=1"
 </div></header>
 <section class="hero" aria-labelledby="hero-heading"><div class="container">
  <h1 id="hero-heading"><span class="ignite-headline-promise" style="text-transform:none"><span class="ignite-headline-gradient">We'll Turn Your Old Leads and Unsigned Estimates</span></span> <span class="ignite-headline-guarantee"><span class="ignite-headline-primary">Into 5+ Booked Jobs in 30 Days,</span> <span class="ignite-headline-secondary">or We Work for Free Until We Do</span></span></h1>
- <p class="hero-subheadline">For contractors that don't want to pay for marketing just to get jobs. you don't have to, they're already sitting there, you just need someone like me to chase them down the right way.</p>
+ <p class="hero-subheadline">Turn the leads you already have into booked jobs without spending more on marketing.</p>
  <div class="ignite-hero-proof" aria-label="$1 million in project revenue"><span class="proof-value">$1M</span><span>in Project Revenue</span></div>
  <h2 class="ignite-video-heading ignite-vsl-heading">WATCH THIS FIRST</h2>
- <div class="ignite-video-frame ignite-vsl-frame"><div class="ignite-video-box"><video id="ignite-client-video" controls autoplay playsinline preload="auto" aria-label="Ignite sales video"><source src="https://files.leadconnectorhq.com/file/6b023b58306ac2375165607f/997-vsl.mp4" type="video/mp4">Your browser does not support video playback.</video><button type="button" id="ignite-unmute" class="ignite-unmute hidden" aria-label="Play video with sound"><span id="ignite-vsl-sound-status">Your video is playing</span><strong id="ignite-vsl-sound-action">Press to unmute</strong></button></div></div>
+ <div class="ignite-video-frame ignite-vsl-frame"><div class="ignite-video-box"><video id="ignite-client-video" controls autoplay muted playsinline webkit-playsinline preload="metadata" src="/media/revival-vsl.mp4" aria-label="Ignite sales video">Your browser does not support video playback.</video><button type="button" id="ignite-unmute" class="ignite-unmute" aria-label="Play video with sound"><span id="ignite-vsl-sound-status">Watch this video</span><strong id="ignite-vsl-sound-action">Press to play with sound</strong></button></div></div>
  <div class="ignite-primary-cta ignite-after-video"><button class="ignite-white-cta ignite-open-quiz" type="button">See If My List Qualifies</button><p>60-SECOND APPLICATION · QUALIFICATION AND WRITTEN TERMS APPLY</p></div>
  <h2 class="ignite-video-heading">Hear What <span class="ignite-red-flow">an Ignite Client Has to Say.</span></h2>
  <p class="ignite-video-proof-line">Hear directly from an Ignite client about their experience.</p>
@@ -1256,43 +1294,80 @@ quizOverlay.addEventListener('keydown',event=>{
  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 });
-/* Attempt audible autoplay once; fall back to muted autoplay and a user-activated sound prompt. */
+/* First-frame recovery: same-origin media, direct CDN fallback, and explicit user playback. */
 const igniteVideo=$('ignite-client-video'),igniteSoundButton=$('ignite-unmute');
 const vslStatus=$('ignite-vsl-sound-status'),vslAction=$('ignite-vsl-sound-action');
-let startingVsl=true, soundRequested=false, manualPlaybackNeeded=false;
+const vslSources=['/media/revival-vsl.mp4','https://files.leadconnectorhq.com/file/6b023b58306ac2375165607f/997-vsl.mp4'];
+let sourceIndex=0, playbackGeneration=0, loadTimer, soundTimer, failed=false, firstFrame=false, userRequestedSound=false;
 function updateVideoSoundButton(){
- const needsSound=igniteVideo.muted||igniteVideo.volume===0||manualPlaybackNeeded;
- const show=!startingVsl&&!igniteVideo.ended&&needsSound;
- igniteSoundButton.classList.toggle('hidden',!show);
- const playing=!igniteVideo.paused&&!igniteVideo.ended;
- vslStatus.textContent=playing?'Your video is playing':'Watch this video';
- vslAction.textContent=playing?'Press to unmute':'Press to play with sound';
- igniteSoundButton.setAttribute('aria-label',playing?'Unmute video':'Play video with sound');
+ const playing=!igniteVideo.paused&&!igniteVideo.ended&&igniteVideo.readyState>=2;
+ const silent=igniteVideo.muted||igniteVideo.volume===0;
+ const needsPrompt=failed||silent||!firstFrame;
+ igniteSoundButton.classList.toggle('hidden',igniteVideo.ended||!needsPrompt);
+ vslStatus.textContent=failed?'Video could not load':playing?'Your video is playing':'Watch this video';
+ vslAction.textContent=failed?'Tap to retry':playing?'Press to unmute':'Press to play with sound';
+ igniteSoundButton.setAttribute('aria-label',failed?'Retry video':playing?'Unmute video':'Play video with sound');
 }
-async function tryAudibleAutoplay(){
- try{
-  igniteVideo.muted=false;
-  await igniteVideo.play();
- }catch{
-  if(soundRequested)return;
-  igniteVideo.muted=true;
-  try{await igniteVideo.play();}catch{manualPlaybackNeeded=true;}
- }finally{startingVsl=false;updateVideoSoundButton();}
+function markFirstFrame(){
+ if(igniteVideo.readyState<2)return;
+ firstFrame=true;failed=false;clearTimeout(loadTimer);updateVideoSoundButton();
 }
-['volumechange','playing','pause','ended'].forEach(event=>igniteVideo.addEventListener(event,updateVideoSoundButton));
-igniteSoundButton.addEventListener('click',async()=>{
- soundRequested=true;
- startingVsl=false;
- igniteVideo.muted=false;
- igniteVideo.volume=1;
- manualPlaybackNeeded=false;
- try{await igniteVideo.play();}catch{manualPlaybackNeeded=true;}
+function setLoadWatchdog(){
+ clearTimeout(loadTimer);
+ loadTimer=setTimeout(()=>{
+  if(firstFrame||igniteVideo.readyState>=2){markFirstFrame();return;}
+  if(sourceIndex===0){startVsl(1,false);return;}
+  failed=true;igniteVideo.pause();updateVideoSoundButton();
+ },sourceIndex===0?6000:10000);
+}
+function tryMuted(generation){
+ if(generation!==playbackGeneration||userRequestedSound)return;
+ clearTimeout(soundTimer);
+ igniteVideo.muted=true;
+ igniteVideo.play().catch(()=>{updateVideoSoundButton();});
+ updateVideoSoundButton();
+}
+function startVsl(index,withGesture){
+ const generation=++playbackGeneration;
+ clearTimeout(soundTimer);clearTimeout(loadTimer);
+ const changed=index!==sourceIndex||failed;
+ sourceIndex=index;failed=false;firstFrame=false;userRequestedSound=withGesture;
+ if(changed||igniteVideo.getAttribute('src')!==vslSources[index]){
+  igniteVideo.src=vslSources[index];
+  igniteVideo.load();
+ }
+ igniteVideo.muted=false;igniteVideo.volume=1;
+ setLoadWatchdog();
+ if(!withGesture)soundTimer=setTimeout(()=>tryMuted(generation),850);
+ igniteVideo.play().then(()=>{
+  if(generation!==playbackGeneration)return;
+  clearTimeout(soundTimer);markFirstFrame();updateVideoSoundButton();
+ }).catch(()=>{
+  if(generation!==playbackGeneration)return;
+  if(!withGesture)tryMuted(generation);
+  else{userRequestedSound=false;tryMuted(generation);}
+  updateVideoSoundButton();
+ });
+ updateVideoSoundButton();
+}
+['loadeddata','canplay','playing'].forEach(event=>igniteVideo.addEventListener(event,markFirstFrame));
+['volumechange','pause','ended','waiting'].forEach(event=>igniteVideo.addEventListener(event,updateVideoSoundButton));
+igniteVideo.addEventListener('error',()=>{
+ if(sourceIndex===0){startVsl(1,false);return;}
+ clearTimeout(loadTimer);failed=true;updateVideoSoundButton();
+});
+igniteSoundButton.addEventListener('click',()=>{
+ if(failed){startVsl(sourceIndex===0?1:0,true);return;}
+ ++playbackGeneration;clearTimeout(soundTimer);userRequestedSound=true;
+ igniteVideo.muted=false;igniteVideo.volume=1;
+ igniteVideo.play().catch(()=>{updateVideoSoundButton();});
+ if(!firstFrame)setLoadWatchdog();
  updateVideoSoundButton();
 });
 const testimonialVideo=$('ignite-testimonial-video');
 testimonialVideo.addEventListener('play',()=>{if(!igniteVideo.paused)igniteVideo.pause();});
 igniteVideo.addEventListener('play',()=>{if(!testimonialVideo.paused)testimonialVideo.pause();});
-tryAudibleAutoplay();
+startVsl(0,false);
 
 /* Seamless proof-image marquee moves RIGHT; logo marquee moves LEFT. */
 const proofRail=$('ignite-proof-marquee');
